@@ -50,9 +50,14 @@ class AdminPanelProvider extends PanelProvider
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
+                \App\Http\Middleware\SetLocale::class, // Add SetLocale middleware
             ])
             ->authMiddleware([
                 Authenticate::class,
-            ]);
+            ])
+            ->plugin(
+                \Filament\SpatieLaravelTranslatablePlugin::make()
+                    ->defaultLocales(['es', 'en']),
+            );
     }
 }

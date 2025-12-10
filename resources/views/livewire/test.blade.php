@@ -1,16 +1,16 @@
 <div class="w-full max-w-4xl bg-white shadow-md rounded-lg p-6">
-    <h1 class="text-2xl font-bold mb-6 text-center text-gray-800">Hartman Value Profile Test</h1>
+    <h1 class="text-2xl font-bold mb-6 text-center text-gray-800">{{ __('test.title') }}</h1>
 
     @if ($currentStep === 1)
         <div class="mb-6">
-            <label for="guestName" class="block text-sm font-medium text-gray-700">Your Name</label>
-            <input type="text" wire:model="guestName" id="guestName" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border" placeholder="Enter your name">
+            <label for="guestName" class="block text-sm font-medium text-gray-700">{{ __('test.your_name') }}</label>
+            <input type="text" wire:model="guestName" id="guestName" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 border" placeholder="{{ __('test.enter_name') }}">
             @error('guestName') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
         </div>
 
         <div class="mb-4">
-            <h2 class="text-xl font-semibold mb-2">Part 1: The World</h2>
-            <p class="text-gray-600 mb-4">Rank the following items from best to worst (top to bottom).</p>
+            <h2 class="text-xl font-semibold mb-2">{{ __('test.part_1_title') }}</h2>
+            <p class="text-gray-600 mb-4">{{ __('test.part_1_instruction') }}</p>
             
             <ul id="part1-list" class="space-y-2">
                 @foreach($part1Items as $item)
@@ -23,12 +23,12 @@
         </div>
 
         <div class="mt-6 flex justify-end">
-            <button wire:click="nextStep" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">Next Part</button>
+            <button wire:click="nextStep" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">{{ __('test.next_part') }}</button>
         </div>
     @elseif ($currentStep === 2)
         <div class="mb-4">
-            <h2 class="text-xl font-semibold mb-2">Part 2: The Self</h2>
-            <p class="text-gray-600 mb-4">Rank the following phrases from most agree to least agree (top to bottom).</p>
+            <h2 class="text-xl font-semibold mb-2">{{ __('test.part_2_title') }}</h2>
+            <p class="text-gray-600 mb-4">{{ __('test.part_2_instruction') }}</p>
 
             <ul id="part2-list" class="space-y-2">
                 @foreach($part2Items as $item)
@@ -41,7 +41,7 @@
         </div>
 
         <div class="mt-6 flex justify-end">
-            <button wire:click="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Submit Test</button>
+            <button wire:click="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">{{ __('test.submit_test') }}</button>
         </div>
     @endif
 

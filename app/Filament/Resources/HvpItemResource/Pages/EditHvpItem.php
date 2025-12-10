@@ -8,6 +8,8 @@ use Filament\Resources\Pages\EditRecord;
 
 class EditHvpItem extends EditRecord
 {
+    use EditRecord\Concerns\Translatable;
+
     protected static string $resource = HvpItemResource::class;
 
     protected function getHeaderActions(): array
