@@ -3,7 +3,6 @@
 use Illuminate\Support\Facades\Route;
 
 use App\Livewire\Test;
-use Illuminate\Support\Facades\Route;
 
 Route::get('locale/{locale}', function ($locale) {
     if (! in_array($locale, ['en', 'es'])) {
@@ -15,8 +14,11 @@ Route::get('locale/{locale}', function ($locale) {
     }
 
     session(['locale' => $locale]);
+    session()->save();
 
     return redirect()->back();
 })->name('locale.switch');
 
+Route::get('/register', \App\Livewire\Register::class)->name('register');
+Route::get('/results/{result}', \App\Livewire\Results::class)->name('results');
 Route::get('/', Test::class)->name('test');

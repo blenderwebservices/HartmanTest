@@ -12,9 +12,9 @@
             <h2 class="text-xl font-semibold mb-2">{{ __('test.part_1_title') }}</h2>
             <p class="text-gray-600 mb-4">{{ __('test.part_1_instruction') }}</p>
             
-            <ul id="part1-list" class="space-y-2">
+            <ul id="part1-list" class="space-y-2" wire:ignore>
                 @foreach($part1Items as $item)
-                    <li data-id="{{ $item->id }}" class="bg-gray-50 p-3 rounded border border-gray-200 cursor-move hover:bg-gray-100 flex items-center">
+                    <li wire:key="item-{{ $item->id }}" data-id="{{ $item->id }}" class="bg-gray-50 p-3 rounded border border-gray-200 cursor-move hover:bg-gray-100 flex items-center">
                         <span class="mr-2 text-gray-400">☰</span>
                         {{ $item->content }}
                     </li>
@@ -30,9 +30,9 @@
             <h2 class="text-xl font-semibold mb-2">{{ __('test.part_2_title') }}</h2>
             <p class="text-gray-600 mb-4">{{ __('test.part_2_instruction') }}</p>
 
-            <ul id="part2-list" class="space-y-2">
+            <ul id="part2-list" class="space-y-2" wire:ignore>
                 @foreach($part2Items as $item)
-                    <li data-id="{{ $item->id }}" class="bg-gray-50 p-3 rounded border border-gray-200 cursor-move hover:bg-gray-100 flex items-center">
+                    <li wire:key="item-{{ $item->id }}" data-id="{{ $item->id }}" class="bg-gray-50 p-3 rounded border border-gray-200 cursor-move hover:bg-gray-100 flex items-center">
                         <span class="mr-2 text-gray-400">☰</span>
                         {{ $item->content }}
                     </li>

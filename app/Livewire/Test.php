@@ -26,8 +26,14 @@ class Test extends Component
     {
         if ($part === 1) {
             $this->part1Ranking = $ranking;
+            $this->part1Items = $this->part1Items->sortBy(function ($item) use ($ranking) {
+                return array_search($item->id, $ranking);
+            })->values();
         } else {
             $this->part2Ranking = $ranking;
+            $this->part2Items = $this->part2Items->sortBy(function ($item) use ($ranking) {
+                return array_search($item->id, $ranking);
+            })->values();
         }
     }
 
@@ -42,12 +48,15 @@ class Test extends Component
 
     public function submit()
     {
-        // Calculate scores (placeholder logic for now)
+        $part1Scores = \App\Models\HvpResult::calculateProfile($this->part1Ranking, 'part_1');
+        $part2Scores = \App\Models\HvpResult::calculateProfile($this->part2Ranking, 'part_2');
+
         $scores = [
-            'integration' => 0, // Implement actual scoring logic later
+            'part_1' => $part1Scores,
+            'part_2' => $part2Scores,
         ];
 
-        \App\Models\HvpResult::create([
+        $result = \App\Models\HvpResult::create([
             'user_id' => auth()->id(),
             'guest_name' => $this->guestName,
             'part_1_ranking' => $this->part1Ranking,
@@ -55,7 +64,7 @@ class Test extends Component
             'scores' => $scores,
         ]);
 
-        return redirect()->route('filament.admin.pages.dashboard'); // Or a success page
+        return redirect()->route('results', ['result' => $result->id]);
     }
 
     public function render()
