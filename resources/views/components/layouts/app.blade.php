@@ -16,8 +16,22 @@
             <a href="{{ route('locale.switch', 'en') }}" class="px-2 py-1 {{ app()->getLocale() === 'en' ? 'font-bold underline' : 'text-gray-500 hover:text-gray-700' }}">EN</a>
         </div>
 
+        <!-- Navigation Links -->
+        <div class="flex items-center space-x-4 text-sm font-medium text-gray-700">
+            <div x-data="{ open: false }" class="relative">
+                <button @click="open = !open" @click.away="open = false" class="flex items-center space-x-1 hover:text-gray-900 focus:outline-none">
+                    <span>{{ __('test.menu_test') }}</span>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                </button>
+                <div x-show="open" class="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-100" style="display: none;">
+                    <a href="{{ route('test') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">{{ __('test.menu_part_1') }}</a>
+                    <a href="{{ route('test') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">{{ __('test.menu_part_2') }}</a>
+                </div>
+            </div>
+            <a href="{{ route('documentation') }}" class="hover:text-gray-900">{{ __('documentation.title') }}</a>
+        </div>
         <!-- User Menu -->
-        <div class="flex items-center space-x-2 text-sm">
+        <div class="flex items-center space-x-4 text-sm">
             @auth
                 <span class="text-gray-700">{{ auth()->user()->name }}</span>
                 <span class="text-gray-300">|</span>

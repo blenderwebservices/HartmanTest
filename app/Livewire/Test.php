@@ -39,11 +39,13 @@ class Test extends Component
 
     public function nextStep()
     {
-        $this->validate([
-            'guestName' => 'required|string|max:255',
-        ]);
-
-        $this->currentStep = 2;
+        if ($this->currentStep === 1) {
+            $this->validate([
+                'guestName' => 'required|string|max:255',
+            ]);
+        }
+        
+        $this->currentStep++;
     }
 
     public function submit()
