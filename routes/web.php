@@ -21,4 +21,5 @@ Route::get('locale/{locale}', function ($locale) {
 
 Route::get('/register', \App\Livewire\Register::class)->name('register');
 Route::get('/results/{result}', \App\Livewire\Results::class)->name('results');
+Route::get('/documentation', \App\Livewire\Documentation::class)->name('documentation');
 Route::get('/', Test::class)->name('test');
