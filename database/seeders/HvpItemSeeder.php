@@ -13,16 +13,6 @@ class HvpItemSeeder extends Seeder
     public function run(): void
     {
         $part1Items = [
-            ['en' => 'A baby', 'es' => 'Un bebé', 'rank' => 1, 'dim' => 'intrinsic', 'polarity' => 'comp'],
-            ['en' => 'Love of nature', 'es' => 'Amor a la naturaleza', 'rank' => 2, 'dim' => 'intrinsic', 'polarity' => 'comp'],
-            ['en' => 'By this ring I thee wed', 'es' => 'Con este anillo te desposo', 'rank' => 3, 'dim' => 'intrinsic', 'polarity' => 'comp'],
-            ['en' => 'A devoted scientist', 'es' => 'Un científico devoto', 'rank' => 4, 'dim' => 'extrinsic', 'polarity' => 'comp'],
-            ['en' => 'A good meal', 'es' => 'Una buena comida', 'rank' => 5, 'dim' => 'extrinsic', 'polarity' => 'comp'],
-            ['en' => 'An assembly line', 'es' => 'Una línea de montaje', 'rank' => 6, 'dim' => 'extrinsic', 'polarity' => 'comp'],
-            ['en' => 'A genius', 'es' => 'Un genio', 'rank' => 7, 'dim' => 'systemic', 'polarity' => 'comp'],
-            ['en' => 'A technical improvement', 'es' => 'Una mejora técnica', 'rank' => 8, 'dim' => 'systemic', 'polarity' => 'comp'],
-            ['en' => 'A uniform', 'es' => 'Un uniforme', 'rank' => 9, 'dim' => 'systemic', 'polarity' => 'comp'],
-            ['en' => 'A mathematical system', 'es' => 'Un sistema matemático', 'rank' => 10, 'dim' => 'systemic', 'polarity' => 'trans'], // Note: User code says "Una idea absurda" for rank 10, but "A mathematical system" is usually comp. Let's check user code mapping.
             // User code: { id: '-Ss', type: 'trans', name: 'Una idea absurda', desc: 'Desvalorizar lo Sistémico sistémicamente.', rank: 10, dim: 'systemic' }
             // My seeded item: "A mathematical system" (Un sistema matemático).
             // Wait, the user code has DIFFERENT items for the "trans" (negative) ones.
@@ -202,23 +192,23 @@ class HvpItemSeeder extends Seeder
             // For the others, I'll make a best guess based on dimension.
             
             ['en' => 'A baby', 'es' => 'Un bebé', 'rank' => 1, 'dim' => 'intrinsic', 'polarity' => 'comp'],
-            ['en' => 'A genius', 'es' => 'Un genio', 'rank' => 7, 'dim' => 'systemic', 'polarity' => 'comp'],
-            ['en' => 'A uniform', 'es' => 'Un uniforme', 'rank' => 9, 'dim' => 'systemic', 'polarity' => 'comp'],
-            ['en' => 'A slave', 'es' => 'Un esclavo', 'rank' => 17, 'dim' => 'intrinsic', 'polarity' => 'trans'], // Similar to Slavery?
-            ['en' => 'A fine art', 'es' => 'Una obra de arte', 'rank' => 2, 'dim' => 'intrinsic', 'polarity' => 'comp'], // Assuming this takes slot 2
-            ['en' => 'A rubbish heap', 'es' => 'Un montón de basura', 'rank' => 14, 'dim' => 'extrinsic', 'polarity' => 'trans'],
-            ['en' => 'A good meal', 'es' => 'Una buena comida', 'rank' => 5, 'dim' => 'extrinsic', 'polarity' => 'comp'],
-            ['en' => 'A technical improvement', 'es' => 'Una mejora técnica', 'rank' => 8, 'dim' => 'systemic', 'polarity' => 'comp'],
-            ['en' => 'A madman', 'es' => 'Un loco', 'rank' => 15, 'dim' => 'extrinsic', 'polarity' => 'trans'],
-            ['en' => 'A devoted scientist', 'es' => 'Un científico devoto', 'rank' => 4, 'dim' => 'extrinsic', 'polarity' => 'comp'],
-            ['en' => 'By this ring I thee wed', 'es' => 'Con este anillo te desposo', 'rank' => 3, 'dim' => 'intrinsic', 'polarity' => 'comp'],
-            ['en' => 'A torture chamber', 'es' => 'Una cámara de tortura', 'rank' => 18, 'dim' => 'intrinsic', 'polarity' => 'trans'],
             ['en' => 'Love of nature', 'es' => 'Amor a la naturaleza', 'rank' => 2, 'dim' => 'intrinsic', 'polarity' => 'comp'], // Conflict with Fine Art.
-            ['en' => 'A mathematical system', 'es' => 'Un sistema matemático', 'rank' => 10, 'dim' => 'systemic', 'polarity' => 'trans'], // Using rank 10 (-Ss) slot?
-            ['en' => 'Blow up an airliner', 'es' => 'Volar un avión de pasajeros', 'rank' => 12, 'dim' => 'systemic', 'polarity' => 'trans'],
-            ['en' => 'Burn a heretic', 'es' => 'Quemar a un hereje', 'rank' => 16, 'dim' => 'intrinsic', 'polarity' => 'trans'],
+            ['en' => 'By this ring I thee wed', 'es' => 'Con este anillo te desposo', 'rank' => 3, 'dim' => 'intrinsic', 'polarity' => 'comp'],
+            ['en' => 'A devoted scientist', 'es' => 'Un científico devoto', 'rank' => 4, 'dim' => 'extrinsic', 'polarity' => 'comp'],
+            ['en' => 'A good meal', 'es' => 'Una buena comida', 'rank' => 5, 'dim' => 'extrinsic', 'polarity' => 'comp'],
             ['en' => 'An assembly line', 'es' => 'Una línea de montaje', 'rank' => 6, 'dim' => 'extrinsic', 'polarity' => 'comp'],
-            ['en' => 'Slavery', 'es' => 'Esclavitud', 'rank' => 17, 'dim' => 'intrinsic', 'polarity' => 'trans'], // Conflict with A slave.
+            ['en' => 'A genius', 'es' => 'Un genio', 'rank' => 7, 'dim' => 'systemic', 'polarity' => 'comp'],
+            ['en' => 'A technical improvement', 'es' => 'Una mejora técnica', 'rank' => 8, 'dim' => 'systemic', 'polarity' => 'comp'],
+            ['en' => 'A uniform', 'es' => 'Un uniforme', 'rank' => 9, 'dim' => 'systemic', 'polarity' => 'comp'],
+            ['en' => 'A mathematical system', 'es' => 'Un sistema matemático', 'rank' => 10, 'dim' => 'systemic', 'polarity' => 'trans'], // Using rank 10 (-Ss) slot?
+            ['en' => 'Una multa', 'es' => 'Una multa', 'rank' => 11, 'dim' => 'systemic', 'polarity' => 'trans'], // Using rank 10 (-Ss) slot?
+            ['en' => 'Blow up an airliner', 'es' => 'Volar un avión de pasajeros', 'rank' => 12, 'dim' => 'systemic', 'polarity' => 'trans'],
+            ['en' => 'Un cortocircuito', 'es' => 'Un cortocircuito', 'rank' => 13, 'dim' => 'systemic', 'polarity' => 'trans'],
+            ['en' => 'A rubbish heap', 'es' => 'Un montón de basura', 'rank' => 14, 'dim' => 'extrinsic', 'polarity' => 'trans'],
+            ['en' => 'A madman', 'es' => 'Un loco', 'rank' => 15, 'dim' => 'extrinsic', 'polarity' => 'trans'],
+            ['en' => 'Burn a heretic', 'es' => 'Quemar a un hereje', 'rank' => 16, 'dim' => 'intrinsic', 'polarity' => 'trans'],
+            ['en' => 'A slave', 'es' => 'Un esclavo', 'rank' => 17, 'dim' => 'intrinsic', 'polarity' => 'trans'], // Similar to Slavery?
+            ['en' => 'A torture chamber', 'es' => 'Una cámara de tortura', 'rank' => 18, 'dim' => 'intrinsic', 'polarity' => 'trans'],
             
             // Resolving conflicts:
             // I have 18 items.
