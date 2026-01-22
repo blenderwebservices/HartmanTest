@@ -15,8 +15,8 @@ class Test extends Component
 
     public function mount()
     {
-        $this->part1Items = \App\Models\HvpItem::where('part', 'part_1')->get();
-        $this->part2Items = \App\Models\HvpItem::where('part', 'part_2')->get();
+        $this->part1Items = \App\Models\HvpItem::where('part', 'part_1')->get()->shuffle();
+        $this->part2Items = \App\Models\HvpItem::where('part', 'part_2')->get()->shuffle();
 
         $this->part1Ranking = $this->part1Items->pluck('id')->toArray();
         $this->part2Ranking = $this->part2Items->pluck('id')->toArray();
@@ -44,7 +44,7 @@ class Test extends Component
                 'guestName' => 'required|string|max:255',
             ]);
         }
-        
+
         $this->currentStep++;
     }
 
