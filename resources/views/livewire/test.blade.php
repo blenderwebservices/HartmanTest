@@ -17,7 +17,7 @@
 
     @elseif ($currentStep === 2)
         <!-- Step 2: Part 1 -->
-        <div class="w-full max-w-4xl mx-auto h-[calc(100vh-100px)] flex flex-col"
+        <div wire:key="step-2" class="w-full max-w-4xl mx-auto h-[calc(100vh-100px)] flex flex-col"
              x-data="{
                  initSortable() {
                      let list = document.getElementById('part1-list');
@@ -53,11 +53,11 @@
                     
                     <ul id="part1-list" class="divide-y divide-gray-200 overflow-y-auto h-full p-6 space-y-3" wire:ignore>
                         @foreach($part1Items as $item)
-                            <li data-id="{{ $item->id }}" wire:key="item-{{ $item->id }}" class="bg-white border border-gray-200 p-4 rounded-lg shadow-sm cursor-move hover:bg-indigo-50 hover:border-indigo-300 transition-all flex items-center group">
+                            <li data-id="{{ $item->id }}" wire:key="item-{{ $item->id }}" class="select-none bg-white border border-gray-200 p-4 rounded-lg shadow-sm cursor-move hover:bg-indigo-50 hover:border-indigo-300 transition-all flex items-center group">
                                 <span class="mr-4 text-gray-400 group-hover:text-indigo-500">
                                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16"></path></svg>
                                 </span>
-                                <span class="text-lg font-medium text-gray-700 group-hover:text-gray-900">{{ $item->getTranslation('content', app()->getLocale()) }}</span>
+                                <span class="text-lg font-medium text-gray-700 group-hover:text-gray-900 pointer-events-none">{{ $item->getTranslation('content', app()->getLocale()) }}</span>
                             </li>
                         @endforeach
                     </ul>
@@ -73,7 +73,7 @@
 
     @elseif ($currentStep === 3)
         <!-- Step 3: Part 2 -->
-        <div class="w-full max-w-4xl mx-auto h-[calc(100vh-100px)] flex flex-col"
+        <div wire:key="step-3" class="w-full max-w-4xl mx-auto h-[calc(100vh-100px)] flex flex-col"
              x-data="{
                  initSortable() {
                      let list = document.getElementById('part2-list');
@@ -109,11 +109,11 @@
 
                     <ul id="part2-list" class="divide-y divide-gray-200 overflow-y-auto h-full p-6 space-y-3" wire:ignore>
                         @foreach($part2Items as $item)
-                            <li data-id="{{ $item->id }}" wire:key="item-{{ $item->id }}" class="bg-white border border-gray-200 p-4 rounded-lg shadow-sm cursor-move hover:bg-indigo-50 hover:border-indigo-300 transition-all flex items-center group">
+                            <li data-id="{{ $item->id }}" wire:key="item-{{ $item->id }}" class="select-none bg-white border border-gray-200 p-4 rounded-lg shadow-sm cursor-move hover:bg-indigo-50 hover:border-indigo-300 transition-all flex items-center group">
                                 <span class="mr-4 text-gray-400 group-hover:text-indigo-500">
                                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16"></path></svg>
                                 </span>
-                                <span class="text-lg font-medium text-gray-700 group-hover:text-gray-900">{{ $item->getTranslation('content', app()->getLocale()) }}</span>
+                                <span class="text-lg font-medium text-gray-700 group-hover:text-gray-900 pointer-events-none">{{ $item->getTranslation('content', app()->getLocale()) }}</span>
                             </li>
                         @endforeach
                     </ul>

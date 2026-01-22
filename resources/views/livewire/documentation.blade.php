@@ -84,6 +84,84 @@
         </div>
     </section>
 
+    <!-- Variables -->
+    <!-- Variables -->
+    <section id="variables" class="mb-16 scroll-mt-20">
+        <div class="text-center mb-12">
+            <h3 class="text-3xl font-bold mb-2">{{ __('documentation.variables_title') }}</h3>
+            <p class="text-md text-gray-600 max-w-2xl mx-auto">{{ __('documentation.variables_desc') }}</p>
+        </div>
+        
+        @php
+            $categories = [
+                [
+                    'title' => __('documentation.cat_1_title'),
+                    'desc' => __('documentation.cat_1_desc'),
+                    'vars' => ['dim_i', 'dim_e', 'dim_s'],
+                    'color' => 'blue'
+                ],
+                [
+                    'title' => __('documentation.cat_2_title'),
+                    'desc' => __('documentation.cat_2_desc'),
+                    'vars' => ['dif', 'dim', 'int', 'dis'],
+                    'color' => 'green'
+                ],
+                [
+                    'title' => __('documentation.cat_3_title'),
+                    'desc' => __('documentation.cat_3_desc'),
+                    'vars' => ['dim_per', 'int_per', 'ai_per'],
+                    'color' => 'orange'
+                ],
+                [
+                    'title' => __('documentation.cat_4_title'),
+                    'desc' => __('documentation.cat_4_desc'),
+                    'vars' => ['vq', 'sq', 'bqr', 'cq', 'rho'],
+                    'color' => 'purple'
+                ]
+            ];
+        @endphp
+
+        <div class="space-y-12">
+            @foreach($categories as $category)
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="p-6 bg-{{ $category['color'] }}-50 border-b border-{{ $category['color'] }}-100">
+                        <h4 class="text-2xl font-bold text-{{ $category['color'] }}-800 mb-2">{{ $category['title'] }}</h4>
+                        <p class="text-{{ $category['color'] }}-700">{{ $category['desc'] }}</p>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-1 lg:grid-cols-2 gap-6 p-6">
+                        @foreach($category['vars'] as $var)
+                            <div class="p-5 border border-gray-200 rounded-lg bg-gray-50 hover:bg-white hover:shadow-md transition-all">
+                                <h5 class="text-lg font-bold text-gray-800 mb-3 border-b pb-2 flex items-center justify-between">
+                                    {{ __('documentation.var_' . $var . '_title') }}
+                                    <span class="text-xs bg-gray-200 text-gray-600 py-1 px-2 rounded-full font-mono">{{ strtoupper($var) }}</span>
+                                </h5>
+                                
+                                <div class="space-y-3 text-sm">
+                                    <div>
+                                        <span class="font-bold text-gray-700 block mb-1">Significado:</span>
+                                        <p class="text-gray-600">{{ __('documentation.var_' . $var . '_meaning') }}</p>
+                                    </div>
+                                    
+                                    <div class="grid grid-cols-1 gap-2">
+                                        <div class="bg-white p-2 rounded border border-gray-100">
+                                            <span class="font-bold text-green-600 text-xs uppercase tracking-wider block mb-1">Rango</span>
+                                            <p class="text-gray-600">{{ __('documentation.var_' . $var . '_range') }}</p>
+                                        </div>
+                                        <div class="bg-white p-2 rounded border border-gray-100">
+                                            <span class="font-bold text-blue-600 text-xs uppercase tracking-wider block mb-1">Cálculo</span>
+                                            <p class="text-gray-600">{{ __('documentation.var_' . $var . '_calc') }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            @endforeach
+        </div>
+    </section>
+
     <!-- Psicosexual -->
     <section id="psicosexual" class="mb-16 bg-gray-100 p-8 rounded-lg">
         <div class="text-center mb-6">

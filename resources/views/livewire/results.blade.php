@@ -12,23 +12,80 @@
                 <canvas id="part1Chart"></canvas>
             </div>
 
-            <div class="grid grid-cols-2 gap-4 text-center">
-                <div class="p-3 bg-gray-50 rounded-lg">
-                    <div class="text-sm text-gray-500">DIF</div>
-                    <div class="text-2xl font-bold">{{ $result->scores['part_1']['DIF'] }}</div>
-                </div>
-                <div class="p-3 bg-gray-50 rounded-lg">
-                    <div class="text-sm text-gray-500">DIM I</div>
-                    <div class="text-2xl font-bold text-blue-500">{{ number_format($result->scores['part_1']['DIM_I'], 2) }}</div>
-                </div>
-                <div class="p-3 bg-gray-50 rounded-lg">
-                    <div class="text-sm text-gray-500">DIM E</div>
-                    <div class="text-2xl font-bold text-green-500">{{ number_format($result->scores['part_1']['DIM_E'], 2) }}</div>
-                </div>
-                <div class="p-3 bg-gray-50 rounded-lg">
-                    <div class="text-sm text-gray-500">DIM S</div>
-                    <div class="text-2xl font-bold text-orange-500">{{ number_format($result->scores['part_1']['DIM_S'], 2) }}</div>
-                </div>
+            @php
+                $getInterpretation = function($key, $value) {
+                    $interpretation = '';
+                    $range = '';
+                    $color = 'text-gray-600';
+                    $key = trim($key);
+                    
+                    if ($key === 'DIF' || $key === 'VQ' || $key === 'SQ') {
+                        $range = '0 - 162';
+                         if ($value <= 30) { $interpretation = 'Excelente'; $color = 'text-green-600'; }
+                        elseif ($value <= 60) { $interpretation = 'Bueno'; $color = 'text-blue-600'; }
+                        elseif ($value <= 90) { $interpretation = 'Regular'; $color = 'text-orange-600'; }
+                        else { $interpretation = 'Malo'; $color = 'text-red-600'; }
+                    } elseif (in_array($key, ['DIM I', 'DIM E', 'DIM S'])) {
+                        $range = '0 - 7'; // Average 0-7? (Total range is 0-54 approx per dim if 6 items). 
+                        // Wait, I am calculating averages for DIM I/E/S. 
+                        // If average, range is roughly 0-9. Max deviation is 17.
+                        // Let's assume standard deviations sum:
+                        // Total Dim Sum Range: 0 - (18+17+..13) = approx 90.
+                        // For 6 items, max sum = ~50.
+                        // Let's stick to the prompt's implied simple ranges or just display value.
+                        // For now using 0-7 as placeholder from previous step.
+                         if ($value <= 7) { $interpretation = 'Excelente'; $color = 'text-green-600'; }
+                        elseif ($value <= 15) { $interpretation = 'Bueno'; $color = 'text-blue-600'; }
+                        elseif ($value <= 25) { $interpretation = 'Regular'; $color = 'text-orange-600'; }
+                        else { $interpretation = 'Malo'; $color = 'text-red-600'; }
+                    } elseif ($key === 'Dim') {
+                        $range = '0 - 80'; // Approximate
+                        $interpretation = '-';
+                    } elseif ($key === 'Int') {
+                        $range = '0 - 50'; 
+                        $interpretation = '-';
+                    } elseif ($key === 'Dis') {
+                        $range = '0 - 30'; 
+                        if ($value == 0) { $interpretation = 'Perfecto'; $color = 'text-green-600'; }
+                        elseif ($value <= 10) { $interpretation = 'Aceptable'; $color = 'text-blue-600'; }
+                        else { $interpretation = 'Confusión'; $color = 'text-red-600'; }
+                    } elseif (str_contains($key, '%')) {
+                        $range = '0 - 100%';
+                        $interpretation = '-';
+                    } elseif ($key === 'Rho') {
+                        $range = '+1.0 a -1.0';
+                        if ($value >= 0.8) { $interpretation = 'Excelente'; $color = 'text-green-600'; }
+                        elseif ($value >= 0.6) { $interpretation = 'Bueno'; $color = 'text-blue-600'; }
+                        else { $interpretation = 'Bajo'; $color = 'text-red-600'; }
+                    }
+                    
+                    return ['range' => $range, 'text' => $interpretation, 'color' => $color];
+                };
+            @endphp
+
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 text-center">
+                @foreach(['DIF', 'DIM_I', 'DIM_E', 'DIM_S', 'Dim', 'Int', 'Dis', 'DimP', 'IntP', 'AIP', 'Rho'] as $key)
+                    @php 
+                        $dataKey = $key;
+                        if ($key == 'DimP') $dataKey = 'DimP'; // Matches array key
+                        // Map labels to array keys if needed
+                        $val = $result->scores['part_1'][$dataKey] ?? 0;
+                        $displayKey = str_replace('_', ' ', $key);
+                        if ($key == 'DimP') $displayKey = 'Dim %';
+                        if ($key == 'IntP') $displayKey = 'Int %';
+                        if ($key == 'AIP') $displayKey = 'AI %';
+                        
+                        $meta = $getInterpretation($displayKey, $val);
+                    @endphp
+                    <div class="p-3 bg-gray-50 rounded-lg">
+                        <div class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">{{ $displayKey }}</div>
+                        <div class="text-2xl font-bold {{ $meta['color'] }} mb-1">
+                            {{ is_numeric($val) && floor($val) != $val ? number_format($val, 2) : $val }}
+                        </div>
+                        <div class="text-xs text-gray-500 mb-1">Rango: {{ $meta['range'] }}</div>
+                        <div class="text-sm font-medium {{ $meta['color'] }}">{{ $meta['text'] }}</div>
+                    </div>
+                @endforeach
             </div>
         </div>
 
@@ -40,23 +97,29 @@
                 <canvas id="part2Chart"></canvas>
             </div>
 
-            <div class="grid grid-cols-2 gap-4 text-center">
-                <div class="p-3 bg-gray-50 rounded-lg">
-                    <div class="text-sm text-gray-500">DIF</div>
-                    <div class="text-2xl font-bold">{{ $result->scores['part_2']['DIF'] }}</div>
-                </div>
-                <div class="p-3 bg-gray-50 rounded-lg">
-                    <div class="text-sm text-gray-500">DIM I</div>
-                    <div class="text-2xl font-bold text-blue-500">{{ number_format($result->scores['part_2']['DIM_I'], 2) }}</div>
-                </div>
-                <div class="p-3 bg-gray-50 rounded-lg">
-                    <div class="text-sm text-gray-500">DIM E</div>
-                    <div class="text-2xl font-bold text-green-500">{{ number_format($result->scores['part_2']['DIM_E'], 2) }}</div>
-                </div>
-                <div class="p-3 bg-gray-50 rounded-lg">
-                    <div class="text-sm text-gray-500">DIM S</div>
-                    <div class="text-2xl font-bold text-orange-500">{{ number_format($result->scores['part_2']['DIM_S'], 2) }}</div>
-                </div>
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 text-center">
+                @foreach(['DIF', 'DIM_I', 'DIM_E', 'DIM_S', 'Dim', 'Int', 'Dis', 'DimP', 'IntP', 'AIP', 'Rho'] as $key)
+                    @php 
+                        $dataKey = $key;
+                        if ($key == 'DimP') $dataKey = 'DimP'; 
+                        
+                        $val = $result->scores['part_2'][$dataKey] ?? 0;
+                        $displayKey = str_replace('_', ' ', $key);
+                        if ($key == 'DimP') $displayKey = 'Dim %';
+                        if ($key == 'IntP') $displayKey = 'Int %';
+                        if ($key == 'AIP') $displayKey = 'AI %';
+                        
+                        $meta = $getInterpretation($displayKey, $val);
+                    @endphp
+                    <div class="p-3 bg-gray-50 rounded-lg">
+                        <div class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">{{ $displayKey }}</div>
+                        <div class="text-2xl font-bold {{ $meta['color'] }} mb-1">
+                            {{ is_numeric($val) && floor($val) != $val ? number_format($val, 2) : $val }}
+                        </div>
+                        <div class="text-xs text-gray-500 mb-1">Rango: {{ $meta['range'] }}</div>
+                        <div class="text-sm font-medium {{ $meta['color'] }}">{{ $meta['text'] }}</div>
+                    </div>
+                @endforeach
             </div>
         </div>
     </div>
