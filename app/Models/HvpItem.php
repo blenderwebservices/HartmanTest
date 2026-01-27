@@ -17,5 +17,8 @@ class HvpItem extends Model
         'part',
         'content',
         'correct_order',
+        'dimension',
+        'polarity',
+        'formula',
     ];
 }
