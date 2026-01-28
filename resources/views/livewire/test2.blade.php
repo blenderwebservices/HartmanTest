@@ -223,6 +223,7 @@
                 currentMaxOrder: 0,
                 draggedId: null,
                 partNumber: partNum,
+                justDragged: false, // Flag to prevent click after drag
 
                 init() {
                     // Initialize
@@ -268,7 +269,8 @@
                 },
 
                 handleClick(id) {
-                    if (this.draggedId) return;
+                    // Prevent click if currently dragging or just finished dragging
+                    if (this.draggedId || this.justDragged) return;
                     
                     const target = this.appItems.find(i => i.id === id);
                     if (!target) return;
@@ -302,6 +304,12 @@
                     e.target.classList.remove('dragging');
                     document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
                     this.draggedId = null;
+                    
+                    // Set flag to ignore subsequent clicks (ghost clicks on mobile)
+                    this.justDragged = true;
+                    setTimeout(() => {
+                        this.justDragged = false;
+                    }, 500); // 500ms debounce
                 },
 
                 handleDragOver(e) {
