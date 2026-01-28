@@ -321,11 +321,18 @@
                 },
 
                 handleDrop(e, targetId) {
-                    const sourceId = this.draggedId; 
-                    if (!sourceId || sourceId === targetId) return;
+                    let sourceId = this.draggedId;
+                    
+                    // Fallback to dataTransfer if drag state is lost (e.g. mobile polyfill quirks)
+                    if (!sourceId) {
+                        sourceId = e.dataTransfer.getData('text/plain');
+                    }
 
-                    const source = this.appItems.find(i => i.id === sourceId);
-                    const target = this.appItems.find(i => i.id === targetId);
+                    if (!sourceId || sourceId == targetId) return;
+
+                    // Use loose equality (==) for ID find, as dataTransfer returns string
+                    const source = this.appItems.find(i => i.id == sourceId);
+                    const target = this.appItems.find(i => i.id == targetId);
 
                     if (!source || !target) return;
 
@@ -334,10 +341,6 @@
 
                     if (sNum !== null && tNum === null) {
                         // Source (Ordered) dropped on Target (Unordered)
-                        // Move Source to Target's random position? 
-                        // Or just swap Order? 
-                        // Logic in prompt: 
-                        // target.order = sNum; source.order = null; swap randomIndices
                         target.order = sNum;
                         source.order = null;
                         
@@ -358,8 +361,6 @@
 
                     } else if (sNum === null && tNum !== null) {
                         // Source (Unordered) dropped on Target (Ordered)
-                        // Take Target's order?
-                        // Logic in prompt: source order = tNum, target order = null, swap random
                         source.order = tNum;
                         target.order = null;
                         
@@ -367,7 +368,9 @@
                         source.randomIndex = target.randomIndex;
                         target.randomIndex = tempIdx;
                     }
-
+                    
+                    // Force state update if needed
+                    this.draggedId = null; 
                     this.refreshMathJax();
                 },
                 
