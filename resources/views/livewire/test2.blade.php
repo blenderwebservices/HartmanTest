@@ -14,17 +14,8 @@
         src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
     </script>
     
-    <script src="https://cdn.jsdelivr.net/npm/mobile-drag-drop@2.3.0-rc.2/index.min.js"></script>
-    <script>
-        // Polyfill for mobile drag and drop
-        var polyfillOptions = {
-            dragImageTranslateOverride: MobileDragDrop.scrollBehaviourDragImageTranslateOverride
-        };
-        MobileDragDrop.polyfill(polyfillOptions);
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 
-        // Fix for iOS/Android scrolling issues while dragging
-        window.addEventListener('touchmove', function() {}, {passive: false});
-    </script>
 
     <style>
         .formula-card {
@@ -132,16 +123,10 @@
 
             <!-- Grid -->
             <div class="w-full max-w-6xl mx-auto px-4 pb-24">
-                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <div x-ref="grid" class="grid grid-cols-2 md:grid-cols-3 gap-4">
                     <template x-for="item in sortedAppItems" :key="item.id">
-                        <div :id="'card-' + item.id"
-                             :draggable="true"
+                        <div :data-id="item.id"
                              @click="handleClick(item.id)"
-                             @dragstart="handleDragStart($event, item.id)"
-                             @dragend="handleDragEnd($event)"
-                             @dragover.prevent="handleDragOver($event)"
-                             @dragleave="handleDragLeave($event)"
-                             @drop.prevent="handleDrop($event, item.id)"
                              :class="`formula-card relative border-2 rounded-lg bg-white flex items-center justify-center cursor-move select-none hover:shadow-md ${item.order !== null ? 'selected' : 'border-gray-200'}`">
                             
                             <div class="text-xl md:text-2xl font-serif pointer-events-none p-4 text-center">
@@ -187,16 +172,10 @@
 
             <!-- Grid -->
             <div class="w-full max-w-6xl mx-auto px-4 pb-24">
-                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <div x-ref="grid" class="grid grid-cols-2 md:grid-cols-3 gap-4">
                     <template x-for="item in sortedAppItems" :key="item.id">
-                        <div :id="'card-' + item.id"
-                             :draggable="true"
+                        <div :data-id="item.id"
                              @click="handleClick(item.id)"
-                             @dragstart="handleDragStart($event, item.id)"
-                             @dragend="handleDragEnd($event)"
-                             @dragover.prevent="handleDragOver($event)"
-                             @dragleave="handleDragLeave($event)"
-                             @drop.prevent="handleDrop($event, item.id)"
                              :class="`formula-card relative border-2 rounded-lg bg-white flex items-center justify-center cursor-move select-none hover:shadow-md ${item.order !== null ? 'selected' : 'border-gray-200'}`">
                             
                             <div class="text-xl md:text-2xl font-serif pointer-events-none p-4 text-center">
@@ -226,21 +205,48 @@
                 justDragged: false, // Flag to prevent click after drag
 
                 init() {
-                    // Initialize
                     this.items = items;
                     this.resetOrder();
+
+                    this.$nextTick(() => {
+                        this.initSortable();
+                    });
+                },
+
+                initSortable() {
+                    if (!this.$refs.grid) return;
+
+                    new Sortable(this.$refs.grid, {
+                        animation: 150,
+                        ghostClass: 'dragging',
+                        delay: 50,
+                        delayOnTouchOnly: true,
+                        onEnd: (evt) => {
+                            if (evt.oldIndex === evt.newIndex) return;
+
+                            const list = this.sortedAppItems;
+                            const sourceItem = list[evt.oldIndex];
+                            const targetItem = list[evt.newIndex];
+
+                            if (!sourceItem || !targetItem) return;
+
+                            this.handleSortableDrop(sourceItem.id, targetItem.id);
+                            
+                            this.justDragged = true;
+                            setTimeout(() => { this.justDragged = false; }, 300);
+                        }
+                    });
                 },
 
                 resetOrder() {
                     this.currentMaxOrder = 0;
-                    // Provide random index
                     const indices = this.shuffle(Array.from({length: this.items.length}, (_, i) => i));
                     
                     this.appItems = this.items.map((item, index) => ({
                         id: item.id,
                         display_content: item.display_content,
-                        order: null, // User selected order (1-18)
-                        randomIndex: indices[index] // Initial random shuffle position
+                        order: null, 
+                        randomIndex: indices[index] 
                     }));
                     
                     this.refreshMathJax();
@@ -248,9 +254,8 @@
 
                 get sortedAppItems() {
                     return [...this.appItems].sort((a, b) => {
-                        // Sorted by Order if present, otherwise by randomIndex
                         if (a.order !== null && b.order !== null) return a.order - b.order;
-                        if (a.order !== null) return -1; // Ordered items first
+                        if (a.order !== null) return -1;
                         if (b.order !== null) return 1;
                         return a.randomIndex - b.randomIndex;
                     });
@@ -269,17 +274,15 @@
                 },
 
                 handleClick(id) {
-                    // Prevent click if currently dragging or just finished dragging
-                    if (this.draggedId || this.justDragged) return;
+                    if (this.justDragged) return;
                     
-                    const target = this.appItems.find(i => i.id === id);
+                    const target = this.appItems.find(i => i.id == id);
                     if (!target) return;
 
                     if (target.order === null) {
                         this.currentMaxOrder++;
                         target.order = this.currentMaxOrder;
                     } else {
-                        // Deselect and shift others down
                         const removedOrder = target.order;
                         target.order = null;
                         this.appItems.forEach(i => {
@@ -292,45 +295,7 @@
                     this.refreshMathJax();
                 },
 
-                handleDragStart(e, id) {
-                    this.draggedId = id;
-                    e.target.classList.add('dragging');
-                    e.dataTransfer.effectAllowed = 'move';
-                    // We need to store ID
-                    e.dataTransfer.setData('text/plain', id);
-                },
-
-                handleDragEnd(e) {
-                    e.target.classList.remove('dragging');
-                    document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
-                    this.draggedId = null;
-                    
-                    // Set flag to ignore subsequent clicks (ghost clicks on mobile)
-                    this.justDragged = true;
-                    setTimeout(() => {
-                        this.justDragged = false;
-                    }, 500); // 500ms debounce
-                },
-
-                handleDragOver(e) {
-                    e.currentTarget.classList.add('drag-over');
-                },
-
-                handleDragLeave(e) {
-                    e.currentTarget.classList.remove('drag-over');
-                },
-
-                handleDrop(e, targetId) {
-                    let sourceId = this.draggedId;
-                    
-                    // Fallback to dataTransfer if drag state is lost (e.g. mobile polyfill quirks)
-                    if (!sourceId) {
-                        sourceId = e.dataTransfer.getData('text/plain');
-                    }
-
-                    if (!sourceId || sourceId == targetId) return;
-
-                    // Use loose equality (==) for ID find, as dataTransfer returns string
+                handleSortableDrop(sourceId, targetId) {
                     const source = this.appItems.find(i => i.id == sourceId);
                     const target = this.appItems.find(i => i.id == targetId);
 
@@ -339,38 +304,28 @@
                     const sNum = source.order;
                     const tNum = target.order;
 
+                    // Swap logic
                     if (sNum !== null && tNum === null) {
-                        // Source (Ordered) dropped on Target (Unordered)
                         target.order = sNum;
                         source.order = null;
-                        
                         const tempIdx = source.randomIndex;
                         source.randomIndex = target.randomIndex;
                         target.randomIndex = tempIdx;
-
                     } else if (sNum !== null && tNum !== null) {
-                        // Both Ordered: Swap Orders
                         source.order = tNum;
                         target.order = sNum;
-
                     } else if (sNum === null && tNum === null) {
-                        // Both Unordered: Swap Random Indices (positions)
                         const tempIdx = source.randomIndex;
                         source.randomIndex = target.randomIndex;
                         target.randomIndex = tempIdx;
-
                     } else if (sNum === null && tNum !== null) {
-                        // Source (Unordered) dropped on Target (Ordered)
                         source.order = tNum;
                         target.order = null;
-                        
                         const tempIdx = source.randomIndex;
                         source.randomIndex = target.randomIndex;
                         target.randomIndex = tempIdx;
                     }
-                    
-                    // Force state update if needed
-                    this.draggedId = null; 
+
                     this.refreshMathJax();
                 },
                 
