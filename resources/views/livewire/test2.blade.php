@@ -14,11 +14,36 @@
         src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
     </script>
     
+    <script src="https://cdn.jsdelivr.net/npm/mobile-drag-drop@2.3.0-rc.2/index.min.js"></script>
+    <script>
+        // Polyfill for mobile drag and drop
+        var polyfillOptions = {
+            dragImageTranslateOverride: MobileDragDrop.scrollBehaviourDragImageTranslateOverride
+        };
+        MobileDragDrop.polyfill(polyfillOptions);
+
+        // Fix for iOS/Android scrolling issues while dragging
+        window.addEventListener('touchmove', function() {}, {passive: false});
+    </script>
+
     <style>
         .formula-card {
             transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
             aspect-ratio: 2 / 1;
-            touch-action: none; 
+            /* Allow vertical scrolling but prevent horizontal for swipe gestures if needed, 
+               though pan-y is better than none for list scrolling */
+            touch-action: pan-y; 
+            
+            /* Prevent native callouts/menus on long press */
+            -webkit-touch-callout: none !important;
+            -webkit-user-select: none !important;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none !important;
+            
+            /* Remove tap highlight color */
+            -webkit-tap-highlight-color: transparent;
         }
         .selected {
             border-color: #3b82f6;
@@ -49,6 +74,11 @@
             border-style: dashed;
             border-color: #3b82f6;
             background-color: #f0f7ff;
+        }
+        
+        /* Specific fix for dragging class if polyfill adds it differently */
+        .dnd-poly-drag-image {
+            opacity: 0.8 !important;
         }
     </style>
 
