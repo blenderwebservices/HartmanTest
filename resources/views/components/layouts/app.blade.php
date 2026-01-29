@@ -41,6 +41,19 @@
                     <a href="{{ route('test2') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">{{ __('test.menu_part_2') }}</a>
                 </div>
             </div>
+
+            <!-- Test 3 Dropdown -->
+            <div x-data="{ open: false }" class="relative">
+                <button @click="open = !open" @click.away="open = false" class="flex items-center space-x-1 hover:text-gray-900 focus:outline-none">
+                    <span>Test 3</span>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                </button>
+                <div x-show="open" class="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-100" style="display: none;">
+                    <a href="{{ route('test3') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">{{ __('test.menu_part_1') }}</a>
+                    <a href="{{ route('test3') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">{{ __('test.menu_part_2') }}</a>
+                </div>
+            </div>
+
             <a href="{{ route('documentation') }}" class="hover:text-gray-900">{{ __('documentation.title') }}</a>
         </div>
         <!-- User Menu -->

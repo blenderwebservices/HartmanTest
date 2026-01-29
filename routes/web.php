@@ -24,3 +24,5 @@ Route::get('/results/{result}', \App\Livewire\Results::class)->name('results');
 Route::get('/documentation', \App\Livewire\Documentation::class)->name('documentation');
 Route::get('/', Test::class)->name('test');
 Route::get('/test2', \App\Livewire\Test2::class)->name('test2');
+Route::get('/test3', \App\Livewire\Test3::class)->name('test3');
+
