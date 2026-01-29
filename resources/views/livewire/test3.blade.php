@@ -231,87 +231,76 @@
                 },
 
                 handleClick(id) {
-                    let visualList = this.sortedAppItems;
-                    const itemIndex = visualList.findIndex(i => i.id == id);
-                    const target = visualList[itemIndex];
+                    let list = this.sortedAppItems;
+                    const idx = list.findIndex(i => i.id == id);
+                    const item = list[idx];
 
-                    if (target.order === null) {
-                        // RANK IT: Assign next number and shift to its physical position
+                    if (item.order === null) {
                         this.currentMaxOrder++;
-                        target.order = this.currentMaxOrder;
-                        
-                        // Move it to index currentMaxOrder - 1 (the end of the ranked section)
-                        const item = visualList.splice(itemIndex, 1)[0];
-                        visualList.splice(this.currentMaxOrder - 1, 0, item);
+                        item.order = this.currentMaxOrder;
                     } else {
-                        // UNRANK IT: Remove number and shift to start of unranked section
-                        const removedOrder = target.order;
-                        target.order = null;
-                        
-                        // Decrement others
-                        visualList.forEach(i => {
-                            if (i.order !== null && i.order > removedOrder) {
-                                i.order--;
-                            }
+                        const removedOrder = item.order;
+                        item.order = null;
+                        list.forEach(i => {
+                            if (i.order !== null && i.order > removedOrder) i.order--;
                         });
                         this.currentMaxOrder--;
-                        
-                        // Move it after the last ranked item
-                        const item = visualList.splice(itemIndex, 1)[0];
-                        visualList.splice(this.currentMaxOrder, 0, item);
                     }
                     
-                    // Synchronize physical order via randomIndex
-                    visualList.forEach((item, index) => {
+                    // Force the partition: Ranked first (1..N), then Unranked
+                    // We sort by order (nulls last) then we can preserve the rest of the order?
+                    this.reorganizeList(list);
+                    this.refreshMathJax();
+                },
+
+                handleLogicSwap(oldIndex, newIndex) {
+                    let list = this.sortedAppItems;
+                    const source = list[oldIndex];
+                    const target = list[newIndex];
+                    
+                    const isSourceRanked = source.order !== null;
+                    const droppedInRankedZone = newIndex < this.currentMaxOrder;
+
+                    if (!isSourceRanked && droppedInRankedZone) {
+                        // INSERTION logic
+                        const moved = list.splice(oldIndex, 1)[0];
+                        list.splice(newIndex, 0, moved);
+                        this.currentMaxOrder++;
+                    } else {
+                        // SWAP logic (Conmutar)
+                        const tempRI = source.randomIndex;
+                        source.randomIndex = target.randomIndex;
+                        target.randomIndex = tempRI;
+                        
+                        // If we swap a ranked with an unranked, the total count doesn't change
+                        // but the items in the positions change. The reorganization will fix the 'order' values.
+                    }
+                    
+                    this.reorganizeList(list);
+                },
+
+                reorganizeList(list) {
+                    // Sort the list based on current state to establish new physical order
+                    list.sort((a, b) => {
+                        if (a.order !== null && b.order !== null) return a.order - b.order;
+                        if (a.order !== null) return -1;
+                        if (b.order !== null) return 1;
+                        return a.randomIndex - b.randomIndex;
+                    });
+
+                    // Re-assign ranks and indices to ensure strictly [1..N][Unranked]
+                    list.forEach((item, index) => {
+                        if (index < this.currentMaxOrder) {
+                            item.order = index + 1;
+                        } else {
+                            item.order = null;
+                        }
                         item.randomIndex = index;
                     });
                     
                     this.refreshMathJax();
                 },
-
-                handleLogicSwap(oldIndex, newIndex) {
-                    let visualList = this.sortedAppItems;
-                    const sourceItem = visualList[oldIndex];
-                    const targetItem = visualList[newIndex];
-                    
-                    const isSourceRanked = sourceItem.order !== null;
-                    const droppedInRankedZone = newIndex < this.currentMaxOrder;
-
-                    if (!isSourceRanked && droppedInRankedZone) {
-                        // RULE: Unranked to Ranked Zone -> INSERT / SHIFT
-                        // Assign the rank of the drop position, shift subsequent ranked items
-                        const moved = visualList.splice(oldIndex, 1)[0];
-                        visualList.splice(newIndex, 0, moved);
-                        this.currentMaxOrder++;
-                        
-                        // Sync randomIndex immediately for the re-rank loop
-                        visualList.forEach((item, index) => {
-                            item.randomIndex = index;
-                        });
-                    } else {
-                        // RULE: "Conmutar" (Swap) physical positions for other cases
-                        // Includes Ranked -> Ranked and Ranked -> Unranked
-                        const tempIdx = sourceItem.randomIndex;
-                        sourceItem.randomIndex = targetItem.randomIndex;
-                        targetItem.randomIndex = tempIdx;
-                    }
-                    
-                    // Re-calculate ranks based on new physical positions
-                    setTimeout(() => {
-                        const updatedList = this.sortedAppItems;
-                        updatedList.forEach((item, index) => {
-                            if (index < this.currentMaxOrder) {
-                                item.order = index + 1;
-                            } else {
-                                item.order = null;
-                            }
-                            // Normalize indices
-                            item.randomIndex = index;
-                        });
-                        this.refreshMathJax();
-                    }, 0);
-                },
-
+                
                 swapPos(a, b) {
                     const temp = a.randomIndex;
                     a.randomIndex = b.randomIndex;
