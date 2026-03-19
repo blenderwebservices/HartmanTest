@@ -348,15 +348,15 @@
                 submitStep() {
                     const ranking = this.getFinalRanking();
                     // Send to Livewire
-                    $wire.updateRanking(this.partNumber, ranking).then(() => {
-                         $wire.nextStep();
+                    this.$wire.updateRanking(this.partNumber, ranking).then(() => {
+                         this.$wire.nextStep();
                     });
                 },
 
                 submitFinal() {
                      const ranking = this.getFinalRanking();
-                     $wire.updateRanking(this.partNumber, ranking).then(() => {
-                         $wire.submit();
+                     this.$wire.updateRanking(this.partNumber, ranking).then(() => {
+                         this.$wire.submit();
                      });
                 }
             }));
