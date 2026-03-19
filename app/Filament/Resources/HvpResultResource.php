@@ -29,17 +29,17 @@ class HvpResultResource extends Resource
                 Forms\Components\TextInput::make('guest_name')
                     ->label('Guest Name')
                     ->disabled(),
-                Forms\Components\Textarea::make('part_1_ranking')
+                Forms\Components\Placeholder::make('part_1_ranking')
                     ->label('Part 1 Ranking')
-                    ->disabled()
+                    ->content(fn ($record) => new \Illuminate\Support\HtmlString('<pre style="background: #f8fafc; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; font-family: monospace; font-size: 0.875rem;">' . json_encode($record?->part_1_ranking ?? [], JSON_PRETTY_PRINT) . '</pre>'))
                     ->columnSpanFull(),
-                Forms\Components\Textarea::make('part_2_ranking')
+                Forms\Components\Placeholder::make('part_2_ranking')
                     ->label('Part 2 Ranking')
-                    ->disabled()
+                    ->content(fn ($record) => new \Illuminate\Support\HtmlString('<pre style="background: #f8fafc; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; font-family: monospace; font-size: 0.875rem;">' . json_encode($record?->part_2_ranking ?? [], JSON_PRETTY_PRINT) . '</pre>'))
                     ->columnSpanFull(),
-                Forms\Components\Textarea::make('scores')
+                Forms\Components\Placeholder::make('scores')
                     ->label('Scores')
-                    ->disabled()
+                    ->content(fn ($record) => new \Illuminate\Support\HtmlString('<pre style="background: #1e293b; color: #f8fafc; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; font-family: monospace; font-size: 0.875rem;">' . json_encode($record?->scores ?? [], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) . '</pre>'))
                     ->columnSpanFull(),
             ]);
     }
