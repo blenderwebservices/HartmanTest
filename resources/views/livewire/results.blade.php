@@ -125,7 +125,7 @@
     </div>
 
     <div class="mt-8 text-center">
-        <a href="{{ route('test') }}" class="bg-indigo-600 text-white px-6 py-2 rounded hover:bg-indigo-700">
+        <a href="{{ route('test3') }}" class="bg-indigo-600 text-white px-6 py-2 rounded hover:bg-indigo-700">
             {{ __('test.retake_test') ?? 'Retake Test' }}
         </a>
     </div>

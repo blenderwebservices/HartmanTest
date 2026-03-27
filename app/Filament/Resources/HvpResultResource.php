@@ -6,10 +6,10 @@ use App\Filament\Resources\HvpResultResource\Pages;
 use App\Filament\Resources\HvpResultResource\RelationManagers;
 use App\Models\HvpResult;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
@@ -17,11 +17,11 @@ class HvpResultResource extends Resource
 {
     protected static ?string $model = HvpResult::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Forms\Components\TextInput::make('user_id')
                     ->label('User ID')

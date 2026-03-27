@@ -8,7 +8,5 @@ use Filament\Resources\Pages\CreateRecord;
 
 class CreateHvpItem extends CreateRecord
 {
-    use CreateRecord\Concerns\Translatable;
-
     protected static string $resource = HvpItemResource::class;
 }

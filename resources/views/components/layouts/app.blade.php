@@ -6,6 +6,7 @@
     <title>{{ $title ?? 'Hartman Test' }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+    @livewireStyles
 </head>
 <body class="bg-gray-100 font-sans antialiased">
     <div class="absolute top-4 right-4 z-10 flex items-center space-x-4">
@@ -18,30 +19,6 @@
 
         <!-- Navigation Links -->
         <div class="flex items-center space-x-4 text-sm font-medium text-gray-700">
-            <!-- Test Dropdown (Original) -->
-            <div x-data="{ open: false }" class="relative">
-                <button @click="open = !open" @click.away="open = false" class="flex items-center space-x-1 hover:text-gray-900 focus:outline-none">
-                    <span>{{ __('test.menu_test') }}</span>
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                </button>
-                <div x-show="open" class="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-100" style="display: none;">
-                    <a href="{{ route('test') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">{{ __('test.menu_part_1') }}</a>
-                    <a href="{{ route('test') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">{{ __('test.menu_part_2') }}</a>
-                </div>
-            </div>
-
-            <!-- Test 2 Dropdown -->
-            <div x-data="{ open: false }" class="relative">
-                <button @click="open = !open" @click.away="open = false" class="flex items-center space-x-1 hover:text-gray-900 focus:outline-none">
-                    <span>Test 2</span>
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                </button>
-                <div x-show="open" class="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-100" style="display: none;">
-                    <a href="{{ route('test2') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">{{ __('test.menu_part_1') }}</a>
-                    <a href="{{ route('test2') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">{{ __('test.menu_part_2') }}</a>
-                </div>
-            </div>
-
             <!-- Test 3 Dropdown -->
             <div x-data="{ open: false }" class="relative">
                 <button @click="open = !open" @click.away="open = false" class="flex items-center space-x-1 hover:text-gray-900 focus:outline-none">
@@ -72,5 +49,7 @@
     <div class="min-h-screen flex flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         {{ $slot }}
     </div>
+    <livewire:chatbot />
+    @livewireScripts
 </body>
 </html>

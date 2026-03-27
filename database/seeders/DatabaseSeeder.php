@@ -28,6 +28,8 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             HvpItemSeeder::class,
+            AiSystemSeeder::class,
+            AiProviderSeeder::class,
         ]);
     }
 }
