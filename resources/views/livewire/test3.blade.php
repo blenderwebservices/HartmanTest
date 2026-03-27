@@ -108,7 +108,7 @@
                 <div class="h-[35vh] flex flex-col items-center justify-end p-6 text-center">
                     <h1 class="text-2xl md:text-3xl font-bold text-gray-900 mb-2">{{ __('test.part_1_title') }}</h1>
                     <p class="text-gray-600 max-w-lg mb-4 text-sm md:text-base">
-                        Tap para numerar. Mantén presionado brevemente para arrastrar e intercambiar. Al hacer clic en un cuadro sin número, los cuadros numerados se reorganizarán automáticamente.
+                        Arrastra los cuadros para ordenarlos del 1 al 18 según tu preferencia. El número de orden se actualiza automáticamente según la posición donde sueltes cada cuadro.
                     </p>
                     <div class="flex gap-2">
                         <button @click="resetOrder()" class="text-xs bg-white border border-gray-300 px-4 py-2 rounded-full hover:bg-gray-50 transition-all shadow-sm active:scale-95">
@@ -124,27 +124,24 @@
                 </div>
 
                 <div class="w-full max-w-5xl mx-auto px-4 pb-20">
-                    <template x-if="showGrid">
                     <div x-ref="grid" id="formula-grid" class="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
                         <template x-for="item in sortedAppItems" :key="item.id">
                             <div :data-id="item.id"
                                  @click="handleClick(item.id)"
-                                 :class="`formula-card relative border-2 rounded-xl bg-white flex items-center justify-center cursor-pointer select-none ${item.order !== null ? 'selected border-blue-500 shadow-sm' : 'border-gray-200'}`">
+                                 :class="`formula-card relative border-2 rounded-xl bg-white flex items-center justify-center cursor-pointer select-none ${item.isSelected ? 'selected border-blue-500 shadow-sm' : 'border-gray-200'}`">
                                 
                                 <div class="text-lg md:text-xl font-medium pointer-events-none p-4 text-center">
                                     <span x-text="item.display_content"></span>
                                 </div>
                                 
-                                <template x-if="item.order !== null">
-                                    <div class="number-badge" x-text="item.order"></div>
+                                <template x-if="item.isSelected">
+                                    <div class="number-badge" x-text="item.randomIndex + 1"></div>
                                 </template>
                                 
-                                <!-- Physical position badge -->
-                                <div class="position-badge" x-text="sortedAppItems.findIndex(i => i.id === item.id) + 1"></div>
+                                <!-- Physical position badge removed as it might confuse with the new rules -->
                             </div>
                         </template>
                     </div>
-                    </template>
                 </div>
             </div>
 
@@ -154,7 +151,7 @@
                 <div class="h-[35vh] flex flex-col items-center justify-end p-6 text-center">
                     <h1 class="text-2xl md:text-3xl font-bold text-gray-900 mb-2">{{ __('test.part_2_title') }}</h1>
                     <p class="text-gray-600 max-w-lg mb-4 text-sm md:text-base">
-                        Tap para numerar. Mantén presionado brevemente para arrastrar e intercambiar. Al hacer clic en un cuadro sin número, los cuadros numerados se reorganizarán automáticamente.
+                        Arrastra los cuadros para ordenarlos del 1 al 18 según tu preferencia. El número de orden se actualiza automáticamente según la posición donde sueltes cada cuadro.
                     </p>
                     <div class="flex gap-2">
                         <button @click="resetOrder()" class="text-xs bg-white border border-gray-300 px-4 py-2 rounded-full hover:bg-gray-50 transition-all shadow-sm active:scale-95">
@@ -170,27 +167,22 @@
                 </div>
 
                 <div class="w-full max-w-5xl mx-auto px-4 pb-20">
-                    <template x-if="showGrid">
                     <div x-ref="grid" id="formula-grid-2" class="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
                         <template x-for="item in sortedAppItems" :key="item.id">
                             <div :data-id="item.id"
                                  @click="handleClick(item.id)"
-                                 :class="`formula-card relative border-2 rounded-xl bg-white flex items-center justify-center cursor-pointer select-none ${item.order !== null ? 'selected border-blue-500 shadow-sm' : 'border-gray-200'}`">
+                                 :class="`formula-card relative border-2 rounded-xl bg-white flex items-center justify-center cursor-pointer select-none ${item.isSelected ? 'selected border-blue-500 shadow-sm' : 'border-gray-200'}`">
                                 
                                 <div class="text-lg md:text-xl font-medium pointer-events-none p-4 text-center">
                                     <span x-text="item.display_content"></span>
                                 </div>
                                 
-                                <template x-if="item.order !== null">
-                                    <div class="number-badge" x-text="item.order"></div>
+                                <template x-if="item.isSelected">
+                                    <div class="number-badge" x-text="item.randomIndex + 1"></div>
                                 </template>
-                                
-                                <!-- Physical position badge -->
-                                <div class="position-badge" x-text="sortedAppItems.findIndex(i => i.id === item.id) + 1"></div>
                             </div>
                         </template>
                     </div>
-                    </template>
                 </div>
             </div>
         @endif
@@ -200,13 +192,10 @@
     <script>
         document.addEventListener('alpine:init', () => {
             Alpine.data('test3Logic', (items, partNum) => ({
-                items: [], // Original items from DB
-                appItems: [], // Local state
-                currentMaxOrder: 0,
-                draggedId: null,
+                items: [], 
+                appItems: [], 
                 partNumber: partNum,
-                justDragged: false, // Flag to prevent click after drag
-                showGrid: true, // For nuclear DOM reset
+                justDragged: false,
                 sortable: null,
 
                 init() {
@@ -225,18 +214,29 @@
                     this.sortable = new Sortable(this.$refs.grid, {
                         animation: 150,
                         ghostClass: 'dragging',
+                        draggable: '.formula-card',
                         delay: 50,
                         delayOnTouchOnly: true,
                         onEnd: (evt) => {
                             if (evt.oldIndex === evt.newIndex) return;
 
                             const list = this.sortedAppItems;
-                            const sourceItem = list[evt.oldIndex];
-                            const targetItem = list[evt.newIndex];
+                            const source = list[evt.oldIndex];
+                            const target = list[evt.newIndex];
 
-                            if (!sourceItem || !targetItem) return;
+                            if (!source || !target) return;
 
-                            this.handleSortableDrop(sourceItem.id, targetItem.id);
+                            // Rule 2.a: Swap positions
+                            const tempIdx = source.randomIndex;
+                            source.randomIndex = target.randomIndex;
+                            target.randomIndex = tempIdx;
+
+                            // Swap selection status
+                            const tempSelected = source.isSelected;
+                            source.isSelected = target.isSelected;
+                            target.isSelected = tempSelected;
+
+                            this.refreshMathJax();
                             
                             this.justDragged = true;
                             setTimeout(() => { this.justDragged = false; }, 300);
@@ -244,17 +244,14 @@
                     });
                 },
 
-                // ... (resetOrder, sortedAppItems, isComplete, shuffle, handleClick stay same)
-                
                 resetOrder() {
-                    this.currentMaxOrder = 0;
                     const indices = this.shuffle(Array.from({length: this.items.length}, (_, i) => i));
                     
                     this.appItems = this.items.map((item, index) => ({
                         id: item.id,
                         display_content: item.display_content,
                         formula: item.formula,
-                        order: null,
+                        isSelected: false, 
                         randomIndex: indices[index]
                     }));
                     
@@ -265,112 +262,43 @@
                     return [...this.appItems].sort((a, b) => a.randomIndex - b.randomIndex);
                 },
 
+                get numSelected() {
+                    return this.appItems.filter(i => i.isSelected).length;
+                },
+
                 get isComplete() {
-                    return this.currentMaxOrder === this.items.length && this.appItems.every(i => i.order !== null);
+                    return this.numSelected === this.items.length;
                 },
 
                 shuffle(array) {
-                    for (let i = array.length - 1; i > 0; i--) {
+                    const newArr = [...array];
+                    for (let i = newArr.length - 1; i > 0; i--) {
                         const j = Math.floor(Math.random() * (i + 1));
-                        [array[i], array[j]] = [array[j], array[i]];
+                        [newArr[i], newArr[j]] = [newArr[j], newArr[i]];
                     }
-                    return array;
+                    return newArr;
                 },
 
                 handleClick(id) {
                     if (this.justDragged) return;
                     
-                    const target = this.appItems.find(i => i.id == id);
-                    if (!target) return;
+                    const item = this.appItems.find(i => i.id == id);
+                    if (!item || item.isSelected) return; 
 
-                    // If clicking unsequenced box and there are sequenced items, auto-reorder first
-                    if (target.order === null && this.currentMaxOrder > 0) {
-                        this.autoReorderSequenced();
+                    const n = this.numSelected; 
+                    const list = this.sortedAppItems;
+                    const itemAtTarget = list[n]; // First unselected position
+
+                    if (itemAtTarget && itemAtTarget.id !== item.id) {
+                        const tempIdx = item.randomIndex;
+                        item.randomIndex = itemAtTarget.randomIndex;
+                        itemAtTarget.randomIndex = tempIdx;
                     }
 
-                    if (target.order === null) {
-                        this.currentMaxOrder++;
-                        target.order = this.currentMaxOrder;
-                    } else {
-                        const removedOrder = target.order;
-                        target.order = null;
-                        this.appItems.forEach(i => {
-                            if (i.order !== null && i.order > removedOrder) {
-                                i.order--;
-                            }
-                        });
-                        this.currentMaxOrder--;
-                    }
+                    item.isSelected = true;
                     this.refreshMathJax();
                 },
 
-                autoReorderSequenced() {
-                    // Get all items with sequence numbers
-                    const sequencedItems = this.appItems.filter(i => i.order !== null);
-                    
-                    if (sequencedItems.length === 0) return;
-                    
-                    // Sort by sequence number
-                    sequencedItems.sort((a, b) => a.order - b.order);
-                    
-                    // Assign new randomIndex values starting from 0
-                    sequencedItems.forEach((item, index) => {
-                        item.randomIndex = index;
-                    });
-                    
-                    // Reassign randomIndex for unsequenced items
-                    const unsequencedItems = this.appItems.filter(i => i.order === null);
-                    const startIndex = sequencedItems.length;
-                    unsequencedItems.forEach((item, index) => {
-                        item.randomIndex = startIndex + index;
-                    });
-                    
-                    // Nuclear option: Force re-render by destroying and recreating grid
-                    this.showGrid = false;
-                    this.$nextTick(() => {
-                        this.showGrid = true;
-                        this.$nextTick(() => {
-                            this.initSortable();
-                            this.refreshMathJax();
-                        });
-                    });
-                },
-
-                handleSortableDrop(sourceId, targetId) {
-                    const source = this.appItems.find(i => i.id == sourceId);
-                    const target = this.appItems.find(i => i.id == targetId);
-
-                    if (!source || !target) return;
-
-                    const sNum = source.order;
-                    const tNum = target.order;
-
-                    // Always swap randomIndex to maintain physical positions
-                    const tempIdx = source.randomIndex;
-                    source.randomIndex = target.randomIndex;
-                    target.randomIndex = tempIdx;
-
-                    // Handle sequence number logic:
-                    // 1. If both have sequential numbers, swap their numbers
-                    if (sNum !== null && tNum !== null) {
-                        source.order = tNum;
-                        target.order = sNum;
-                    } 
-                    // 2. If source has number and target doesn't, transfer number
-                    else if (sNum !== null && tNum === null) {
-                        target.order = sNum;
-                        source.order = null;
-                    }
-                    // 3. If target has number and source doesn't, transfer number
-                    else if (sNum === null && tNum !== null) {
-                        source.order = tNum;
-                        target.order = null;
-                    }
-                    // 4. If neither has a number, positions are already swapped via randomIndex
-
-                    this.refreshMathJax();
-                },
-                
                 refreshMathJax() {
                     this.$nextTick(() => {
                         if (window.MathJax && window.MathJax.typesetPromise) {
@@ -380,9 +308,7 @@
                 },
 
                 getFinalRanking() {
-                    return [...this.appItems]
-                        .sort((a, b) => a.order - b.order)
-                        .map(i => i.id);
+                    return this.sortedAppItems.map(i => i.id);
                 },
 
                 submitStep() {
