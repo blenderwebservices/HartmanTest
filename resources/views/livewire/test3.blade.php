@@ -283,19 +283,34 @@
                     if (this.justDragged) return;
                     
                     const item = this.appItems.find(i => i.id == id);
-                    if (!item || item.isSelected) return; 
+                    if (!item) return;
 
-                    const n = this.numSelected; 
-                    const list = this.sortedAppItems;
-                    const itemAtTarget = list[n]; // First unselected position
+                    if (item.isSelected) {
+                        // Rule update: if selected, unselect and swap with the highest-positioned selected item
+                        const n = this.numSelected;
+                        const list = this.sortedAppItems;
+                        const lastSelected = list[n - 1]; // Selected item with the "highest position"
 
-                    if (itemAtTarget && itemAtTarget.id !== item.id) {
-                        const tempIdx = item.randomIndex;
-                        item.randomIndex = itemAtTarget.randomIndex;
-                        itemAtTarget.randomIndex = tempIdx;
+                        if (lastSelected && lastSelected.id !== item.id) {
+                            const tempIdx = item.randomIndex;
+                            item.randomIndex = lastSelected.randomIndex;
+                            lastSelected.randomIndex = tempIdx;
+                        }
+                        item.isSelected = false;
+                    } else {
+                        // Original logic for selecting
+                        const n = this.numSelected; 
+                        const list = this.sortedAppItems;
+                        const itemAtTarget = list[n]; // First unselected position
+
+                        if (itemAtTarget && itemAtTarget.id !== item.id) {
+                            const tempIdx = item.randomIndex;
+                            item.randomIndex = itemAtTarget.randomIndex;
+                            itemAtTarget.randomIndex = tempIdx;
+                        }
+                        item.isSelected = true;
                     }
 
-                    item.isSelected = true;
                     this.refreshMathJax();
                 },
 
