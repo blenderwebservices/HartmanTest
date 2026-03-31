@@ -18,7 +18,7 @@ class HvpItemResource extends Resource
 
     protected static ?string $model = HvpItem::class;
 
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
 
     public static function form(Schema $schema): Schema
     {

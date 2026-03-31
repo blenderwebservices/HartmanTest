@@ -17,7 +17,7 @@ class HvpResultResource extends Resource
 {
     protected static ?string $model = HvpResult::class;
 
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
 
     public static function form(Schema $schema): Schema
     {

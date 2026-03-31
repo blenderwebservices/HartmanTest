@@ -8,17 +8,15 @@ use App\Filament\Resources\AiProviders\Pages\ListAiProviders;
 use App\Filament\Resources\AiProviders\Schemas\AiProviderForm;
 use App\Filament\Resources\AiProviders\Tables\AiProvidersTable;
 use App\Models\AiProvider;
-use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 
 class AiProviderResource extends Resource
 {
     protected static ?string $model = AiProvider::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCpuChip;
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-cpu-chip';
 
     protected static ?string $navigationLabel = 'Configuración IA';
 
@@ -26,7 +24,7 @@ class AiProviderResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Proveedores IA';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Inteligencia Artificial';
+    protected static \UnitEnum|string|null $navigationGroup = 'Inteligencia Artificial';
 
     public static function form(Schema $schema): Schema
     {
