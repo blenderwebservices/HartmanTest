@@ -28,7 +28,7 @@ class Register extends Component
 
         auth()->login($user);
 
-        return redirect()->route('test');
+        return redirect()->route('test3');
     }
 
     public function render()
