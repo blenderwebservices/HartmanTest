@@ -195,7 +195,6 @@
                 items: [], 
                 appItems: [], 
                 partNumber: partNum,
-                justDragged: false,
                 sortable: null,
 
                 init() {
@@ -217,27 +216,37 @@
                         draggable: '.formula-card',
                         delay: 50,
                         delayOnTouchOnly: true,
+                        
+                        // Rule iii & iv: Prevent unselected items from being moved before selected ones
+                        onMove: (evt) => {
+                            const draggedId = evt.dragged.getAttribute('data-id');
+                            const targetId = evt.related.getAttribute('data-id');
+                            
+                            const draggedItem = this.appItems.find(i => i.id == draggedId);
+                            const targetItem = this.appItems.find(i => i.id == targetId);
+
+                            if (!draggedItem.isSelected && targetItem.isSelected) {
+                                return false; // Rule iii: No se permite soltar un no seleccionado atrás de uno seleccionado
+                            }
+                            return true;
+                        },
+
                         onEnd: (evt) => {
                             if (evt.oldIndex === evt.newIndex) return;
 
-                            const list = this.sortedAppItems;
-                            const source = list[evt.oldIndex];
-                            const target = list[evt.newIndex];
-
-                            if (!source || !target) return;
-
-                            // Rule 2.a: Swap positions
-                            const tempIdx = source.randomIndex;
-                            source.randomIndex = target.randomIndex;
-                            target.randomIndex = tempIdx;
-
-                            // Swap selection status
-                            const tempSelected = source.isSelected;
-                            source.isSelected = target.isSelected;
-                            target.isSelected = tempSelected;
+                            // Get the new order from Sortable's DOM state
+                            const newOrderIds = this.sortable.toArray();
+                            
+                            // Rebuild appItems based on this new visual order
+                            // and update randomIndex to match new positions
+                            newOrderIds.forEach((id, index) => {
+                                const item = this.appItems.find(i => i.id == id);
+                                if (item) {
+                                    item.randomIndex = index;
+                                }
+                            });
 
                             this.refreshMathJax();
-                            
                             this.justDragged = true;
                             setTimeout(() => { this.justDragged = false; }, 300);
                         }
@@ -245,17 +254,19 @@
                 },
 
                 resetOrder() {
-                    const indices = this.shuffle(Array.from({length: this.items.length}, (_, i) => i));
+                    // Random initialization
+                    const shuffledItems = this.shuffle([...this.items]);
                     
-                    this.appItems = this.items.map((item, index) => ({
+                    this.appItems = shuffledItems.map((item, index) => ({
                         id: item.id,
                         display_content: item.display_content,
                         formula: item.formula,
                         isSelected: false, 
-                        randomIndex: indices[index]
+                        randomIndex: index
                     }));
                     
                     this.refreshMathJax();
+                    this.$nextTick(() => this.initSortable());
                 },
 
                 get sortedAppItems() {
@@ -286,29 +297,42 @@
                     if (!item) return;
 
                     if (item.isSelected) {
-                        // Rule update: if selected, unselect and swap with the highest-positioned selected item
-                        const n = this.numSelected;
-                        const list = this.sortedAppItems;
-                        const lastSelected = list[n - 1]; // Selected item with the "highest position"
-
-                        if (lastSelected && lastSelected.id !== item.id) {
-                            const tempIdx = item.randomIndex;
-                            item.randomIndex = lastSelected.randomIndex;
-                            lastSelected.randomIndex = tempIdx;
-                        }
+                        // Unselecting: just turn off selection
+                        // Requirement doesn't explicitly say to move it back, 
+                        // but usually it stays where it is but loses selection status and number.
+                        // However, based on rule iii, a non-selected cannot be before selected.
+                        // So if we unselect an item that is NOT the last selected, 
+                        // we might violate the rule.
+                        
+                        // Let's assume unselecting is allowed and it stays in its position if valid,
+                        // OR we move it after the last selected.
                         item.isSelected = false;
-                    } else {
-                        // Original logic for selecting
-                        const n = this.numSelected; 
+                        
+                        // To maintain consistency with rule iii: move it after all selected items if needed.
                         const list = this.sortedAppItems;
-                        const itemAtTarget = list[n]; // First unselected position
-
-                        if (itemAtTarget && itemAtTarget.id !== item.id) {
-                            const tempIdx = item.randomIndex;
-                            item.randomIndex = itemAtTarget.randomIndex;
-                            itemAtTarget.randomIndex = tempIdx;
-                        }
+                        const firstUnselectedIndex = list.findIndex(i => !i.isSelected && i.id != item.id);
+                        
+                        // Actually, easiest is just to re-run the sortable logic after updating state.
+                    } else {
+                        // Selecting: Move to the position following the last selected item (Rule 1.a)
+                        const n = this.numSelected; 
+                        const currentIdx = item.randomIndex;
+                        const targetIdx = n; // 0-indexed position for (n+1)th item
+                        
                         item.isSelected = true;
+
+                        if (currentIdx !== targetIdx) {
+                            // Extract item and re-insert at target index to shift everything
+                            const list = this.sortedAppItems;
+                            const [movedItem] = list.splice(currentIdx, 1);
+                            list.splice(targetIdx, 0, movedItem);
+
+                            // Update all randomIndex
+                            list.forEach((it, idx) => {
+                                const original = this.appItems.find(i => i.id == it.id);
+                                original.randomIndex = idx;
+                            });
+                        }
                     }
 
                     this.refreshMathJax();
