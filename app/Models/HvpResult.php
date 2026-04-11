@@ -15,6 +15,7 @@ class HvpResult extends Model
         'part_1_ranking',
         'part_2_ranking',
         'scores',
+        'ai_interpretation',
     ];
 
     protected $casts = [

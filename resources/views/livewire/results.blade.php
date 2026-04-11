@@ -1,4 +1,22 @@
 <div class="w-full max-w-6xl mx-auto p-6">
+    <style>
+        .clay-card {
+            border-radius: 40px;
+            background: #ffffff;
+            border: 4px solid #ffffff;
+            /* Neumorphism / Claymorphism effect based on qcc-ia */
+            box-shadow: 20px 20px 40px rgba(0,0,0,0.08), 
+                        inset -6px -6px 12px rgba(0,0,0,0.05), 
+                        inset 6px 6px 12px rgba(255,255,255,1);
+        }
+
+        .markdown-content h1 { font-size: 1.5rem; font-weight: 800; margin-top: 1.5rem; margin-bottom: 0.5rem; }
+        .markdown-content h2 { font-size: 1.25rem; font-weight: 700; margin-top: 1.25rem; margin-bottom: 0.5rem; }
+        .markdown-content p { margin-bottom: 1rem; line-height: 1.6; color: #4b5563; }
+        .markdown-content strong { font-weight: 700; color: #1f2937; }
+        .markdown-content ul { list-style-type: disc; margin-left: 1.5rem; margin-bottom: 1rem; }
+        .markdown-content li { margin-bottom: 0.5rem; }
+    </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <h1 class="text-3xl font-bold mb-8 text-center text-gray-800">{{ __('test.results_title') ?? 'Test Results' }}</h1>
@@ -124,8 +142,49 @@
         </div>
     </div>
 
+    <div wire:init="generateAiInterpretation" class="mt-12 mb-12">
+        <div class="clay-card p-8 md:p-12 transition-all duration-500 hover:scale-[1.01]">
+            <div class="flex items-center gap-4 mb-8 border-b-2 border-gray-100 pb-6">
+                <div class="bg-indigo-600 p-3 rounded-2xl shadow-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                </div>
+                <div class="flex-1">
+                    <h3 class="text-2xl font-black text-gray-800 tracking-tight">Interpretación del Agente IA ✨</h3>
+                    <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Powered by Hartman Intelligence Agent</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    @if($aiInterpretation && !$isLoadingAi)
+                        <button wire:click="downloadPdf" class="flex items-center gap-2 bg-white border-2 border-indigo-600 text-indigo-600 px-4 py-2 rounded-xl font-bold hover:bg-indigo-50 transition-all active:scale-95 shadow-sm">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                            </svg>
+                            Descargar PDF
+                        </button>
+                    @endif
+                </div>
+            </div>
+
+            @if($isLoadingAi)
+                <div class="flex flex-col items-center justify-center py-12 space-y-4">
+                    <div class="w-12 h-12 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+                    <p class="text-indigo-600 font-bold animate-pulse">Analizando perfiles axiológicos...</p>
+                </div>
+            @elseif($aiInterpretation)
+                <div class="markdown-content text-gray-700">
+                    {!! Illuminate\Support\Str::markdown($aiInterpretation) !!}
+                </div>
+            @else
+                <div class="text-center py-8 text-gray-400 font-medium italic">
+                    Esperando datos para iniciar el análisis...
+                </div>
+            @endif
+        </div>
+    </div>
+
     <div class="mt-8 text-center">
-        <a href="{{ route('test3') }}" class="bg-indigo-600 text-white px-6 py-2 rounded hover:bg-indigo-700">
+        <a href="{{ route('test3') }}" class="bg-indigo-600 text-white px-6 py-2 rounded-full font-bold shadow-lg hover:bg-indigo-700 transition-all hover:scale-105 active:scale-95 inline-block">
             {{ __('test.retake_test') ?? 'Retake Test' }}
         </a>
     </div>

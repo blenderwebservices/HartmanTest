@@ -108,7 +108,7 @@
                 <div class="h-[35vh] flex flex-col items-center justify-end p-6 text-center">
                     <h1 class="text-2xl md:text-3xl font-bold text-gray-900 mb-2">{{ __('test.part_1_title') }}</h1>
                     <p class="text-gray-600 max-w-lg mb-4 text-sm md:text-base">
-                        Arrastra los cuadros para ordenarlos del 1 al 18 según tu preferencia. El número de orden se actualiza automáticamente según la posición donde sueltes cada cuadro.
+                        Haz clic en los cuadros para ordenarlos del 1 al 18 según tu preferencia. El número de orden se asignará automáticamente en el orden en que los selecciones.
                     </p>
                     <div class="flex gap-2">
                         <button @click="resetOrder()" class="text-xs bg-white border border-gray-300 px-4 py-2 rounded-full hover:bg-gray-50 transition-all shadow-sm active:scale-95">
@@ -151,7 +151,7 @@
                 <div class="h-[35vh] flex flex-col items-center justify-end p-6 text-center">
                     <h1 class="text-2xl md:text-3xl font-bold text-gray-900 mb-2">{{ __('test.part_2_title') }}</h1>
                     <p class="text-gray-600 max-w-lg mb-4 text-sm md:text-base">
-                        Arrastra los cuadros para ordenarlos del 1 al 18 según tu preferencia. El número de orden se actualiza automáticamente según la posición donde sueltes cada cuadro.
+                        Haz clic en los cuadros para ordenarlos del 1 al 18 según tu preferencia. El número de orden se asignará automáticamente en el orden en que los selecciones.
                     </p>
                     <div class="flex gap-2">
                         <button @click="resetOrder()" class="text-xs bg-white border border-gray-300 px-4 py-2 rounded-full hover:bg-gray-50 transition-all shadow-sm active:scale-95">
@@ -214,42 +214,7 @@
                         animation: 150,
                         ghostClass: 'dragging',
                         draggable: '.formula-card',
-                        delay: 50,
-                        delayOnTouchOnly: true,
-                        
-                        // Rule iii & iv: Prevent unselected items from being moved before selected ones
-                        onMove: (evt) => {
-                            const draggedId = evt.dragged.getAttribute('data-id');
-                            const targetId = evt.related.getAttribute('data-id');
-                            
-                            const draggedItem = this.appItems.find(i => i.id == draggedId);
-                            const targetItem = this.appItems.find(i => i.id == targetId);
-
-                            if (!draggedItem.isSelected && targetItem.isSelected) {
-                                return false; // Rule iii: No se permite soltar un no seleccionado atrás de uno seleccionado
-                            }
-                            return true;
-                        },
-
-                        onEnd: (evt) => {
-                            if (evt.oldIndex === evt.newIndex) return;
-
-                            // Get the new order from Sortable's DOM state
-                            const newOrderIds = this.sortable.toArray();
-                            
-                            // Rebuild appItems based on this new visual order
-                            // and update randomIndex to match new positions
-                            newOrderIds.forEach((id, index) => {
-                                const item = this.appItems.find(i => i.id == id);
-                                if (item) {
-                                    item.randomIndex = index;
-                                }
-                            });
-
-                            this.refreshMathJax();
-                            this.justDragged = true;
-                            setTimeout(() => { this.justDragged = false; }, 300);
-                        }
+                        disabled: true, // Temporarily disabled as per request
                     });
                 },
 
@@ -291,49 +256,33 @@
                 },
 
                 handleClick(id) {
-                    if (this.justDragged) return;
-                    
                     const item = this.appItems.find(i => i.id == id);
                     if (!item) return;
 
+                    const list = this.sortedAppItems;
+                    const currentIdx = item.randomIndex;
+
                     if (item.isSelected) {
-                        // Unselecting: just turn off selection
-                        // Requirement doesn't explicitly say to move it back, 
-                        // but usually it stays where it is but loses selection status and number.
-                        // However, based on rule iii, a non-selected cannot be before selected.
-                        // So if we unselect an item that is NOT the last selected, 
-                        // we might violate the rule.
-                        
-                        // Let's assume unselecting is allowed and it stays in its position if valid,
-                        // OR we move it after the last selected.
+                        // Unselecting: Move to the end and turn off selection
                         item.isSelected = false;
                         
-                        // To maintain consistency with rule iii: move it after all selected items if needed.
-                        const list = this.sortedAppItems;
-                        const firstUnselectedIndex = list.findIndex(i => !i.isSelected && i.id != item.id);
-                        
-                        // Actually, easiest is just to re-run the sortable logic after updating state.
+                        // Move to the end of the entire list (position 17)
+                        const [movedItem] = list.splice(currentIdx, 1);
+                        list.push(movedItem);
                     } else {
-                        // Selecting: Move to the position following the last selected item (Rule 1.a)
+                        // Selecting: Move to the position following the last selected item
                         const n = this.numSelected; 
-                        const currentIdx = item.randomIndex;
-                        const targetIdx = n; // 0-indexed position for (n+1)th item
-                        
                         item.isSelected = true;
 
-                        if (currentIdx !== targetIdx) {
-                            // Extract item and re-insert at target index to shift everything
-                            const list = this.sortedAppItems;
-                            const [movedItem] = list.splice(currentIdx, 1);
-                            list.splice(targetIdx, 0, movedItem);
-
-                            // Update all randomIndex
-                            list.forEach((it, idx) => {
-                                const original = this.appItems.find(i => i.id == it.id);
-                                original.randomIndex = idx;
-                            });
-                        }
+                        const [movedItem] = list.splice(currentIdx, 1);
+                        list.splice(n, 0, movedItem);
                     }
+
+                    // Update all randomIndex to reflect the new order
+                    list.forEach((it, idx) => {
+                        const original = this.appItems.find(i => i.id == it.id);
+                        original.randomIndex = idx;
+                    });
 
                     this.refreshMathJax();
                 },
