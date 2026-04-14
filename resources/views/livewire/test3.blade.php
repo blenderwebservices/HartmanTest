@@ -108,7 +108,7 @@
                 <div class="h-[35vh] flex flex-col items-center justify-end p-6 text-center">
                     <h1 class="text-2xl md:text-3xl font-bold text-gray-900 mb-2">{{ __('test.part_1_title') }}</h1>
                     <p class="text-gray-600 max-w-lg mb-4 text-sm md:text-base">
-                        Haz clic en los cuadros para ordenarlos del 1 al 18 según tu preferencia. El número de orden se asignará automáticamente en el orden en que los selecciones.
+                        Haz clic en los cuadros para seleccionarlos o <strong>arrástralos</strong> para ordenarlos del 1 al 18 según tu preferencia.
                     </p>
                     <div class="flex gap-2">
                         <button @click="resetOrder()" class="text-xs bg-white border border-gray-300 px-4 py-2 rounded-full hover:bg-gray-50 transition-all shadow-sm active:scale-95">
@@ -151,7 +151,7 @@
                 <div class="h-[35vh] flex flex-col items-center justify-end p-6 text-center">
                     <h1 class="text-2xl md:text-3xl font-bold text-gray-900 mb-2">{{ __('test.part_2_title') }}</h1>
                     <p class="text-gray-600 max-w-lg mb-4 text-sm md:text-base">
-                        Haz clic en los cuadros para ordenarlos del 1 al 18 según tu preferencia. El número de orden se asignará automáticamente en el orden en que los selecciones.
+                        Haz clic en los cuadros para seleccionarlos o <strong>arrástralos</strong> para ordenarlos del 1 al 18 según tu preferencia.
                     </p>
                     <div class="flex gap-2">
                         <button @click="resetOrder()" class="text-xs bg-white border border-gray-300 px-4 py-2 rounded-full hover:bg-gray-50 transition-all shadow-sm active:scale-95">
@@ -211,10 +211,34 @@
                     if (!this.$refs.grid) return;
 
                     this.sortable = new Sortable(this.$refs.grid, {
-                        animation: 150,
+                        animation: 250,
                         ghostClass: 'dragging',
                         draggable: '.formula-card',
-                        disabled: true, // Temporarily disabled as per request
+                        onEnd: (evt) => {
+                            const domNodes = Array.from(this.$refs.grid.querySelectorAll('.formula-card'));
+                            const idOrder = domNodes.map(node => node.getAttribute('data-id'));
+                            
+                            // Determine which items should be selected
+                            // If user is dragging, we assume they are ranking.
+                            // However, to keep it consistent with the "click" logic, 
+                            // we can say that any item moved to the front is definitely selected.
+                            // But usually, it's simpler to just mark ALL as selected once a drag is completed,
+                            // or keep their previous selection state but update positions.
+                            
+                            idOrder.forEach((id, index) => {
+                                const item = this.appItems.find(i => i.id == id);
+                                if (item) {
+                                    item.randomIndex = index;
+                                    // If an item is dragged to a position <= current selected count, 
+                                    // or if we just want to make it selected when dragged.
+                                    if (evt.oldIndex !== evt.newIndex && item.id == evt.item.getAttribute('data-id')) {
+                                        item.isSelected = true;
+                                    }
+                                }
+                            });
+                            
+                            this.refreshMathJax();
+                        }
                     });
                 },
 
@@ -264,11 +288,13 @@
 
                     if (item.isSelected) {
                         // Unselecting: Move to the end and turn off selection
+                        const n = this.numSelected-1;
                         item.isSelected = false;
                         
                         // Move to the end of the entire list (position 17)
                         const [movedItem] = list.splice(currentIdx, 1);
-                        list.push(movedItem);
+                        list.splice(n, 0, movedItem);
+                        //list.push(movedItem);
                     } else {
                         // Selecting: Move to the position following the last selected item
                         const n = this.numSelected; 
