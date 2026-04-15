@@ -181,24 +181,38 @@ new class extends Component {
 @script
 <script>
     $wire.on('message-sent', () => {
-        $nextTick(() => {
+        // Small delay to allow KaTeX and Markdown to finish rendering/applying styles
+        setTimeout(() => {
             const chatMessages = document.getElementById('chat-messages');
-            const userMessages = chatMessages.querySelectorAll('.justify-end'); // User messages
+            if (!chatMessages) return;
+
+            // Find the last user message
+            const userMessages = chatMessages.querySelectorAll('.flex.justify-end');
             
             if (userMessages.length > 0) {
-                // Scroll to the last user message to show the start of the response
                 const lastUserMsg = userMessages[userMessages.length - 1];
-                lastUserMsg.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                
+                // Use scrollIntoView with start alignment to put message at the top
+                lastUserMsg.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'start', 
+                    inline: 'nearest' 
+                });
             } else {
-                chatMessages.scrollTop = chatMessages.scrollHeight;
+                chatMessages.scrollTo({
+                    top: chatMessages.scrollHeight,
+                    behavior: 'smooth'
+                });
             }
-        });
+        }, 100);
     });
 
     $wire.on('chat-opened', () => {
         $nextTick(() => {
             const chatMessages = document.getElementById('chat-messages');
-            chatMessages.scrollTop = chatMessages.scrollHeight;
+            if (chatMessages) {
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
         });
     });
 </script>
