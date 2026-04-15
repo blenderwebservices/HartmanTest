@@ -57,6 +57,7 @@
     </section>
 
     <!-- Formulas -->
+    @if(auth()->user()?->isAdmin())
     <section id="formulas" class="mb-16 scroll-mt-20">
         <div class="text-center mb-12">
             <h3 class="text-3xl font-bold mb-2">{{ __('documentation.formulas_title') }}</h3>
@@ -99,6 +100,7 @@
             @endforeach
         </div>
     </section>
+    @endif
 
     <!-- Variables -->
     <!-- Variables -->

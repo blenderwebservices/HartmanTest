@@ -1,59 +1,54 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Hartman Value Profile (HVP) - Codexia Hub
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## Descripción del Proyecto
+Esta aplicación es una implementación digital avanzada del **Test de Hartman** (Hartman Value Profile - HVP), una herramienta científica basada en la axiología formal desarrollada por el Dr. Robert S. Hartman. A diferencia de los tests de personalidad tradicionales, este test mide la estructura de los juicios de valor de un individuo, permitiendo entender cómo perciben la realidad externa y su propio yo.
 
-## About Laravel
+## ¿A quién está dirigida?
+La plataforma está diseñada para:
+*   **Departamentos de Recursos Humanos**: Para procesos de selección de personal alineados con los valores culturales de la empresa.
+*   **Consultores y Coaches**: Como herramienta base para procesos de desarrollo profesional y personal.
+*   **Empresas (Codexia Hub)**: Para la gestión interna del talento y optimización de equipos.
+*   **Individuos**: Que buscan un mayor autoconocimiento sobre sus capacidades de juicio y toma de decisiones.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Resultados y Variables Calculadas
+El sistema procesa los rankings de los usuarios para generar un perfil técnico completo que incluye:
+*   **DIF (Desviación Total)**: Sensibilidad axiológica general.
+*   **DIM_I, DIM_E, DIM_S**: Claridad en las dimensiones Intrínseca (personas), Extrínseca (cosas/roles) y Sistémica (ideas).
+*   **Dim (Dimensión)**: Capacidad de enfoque y equilibrio entre dimensiones.
+*   **Int (Integración)**: Habilidad para ver el "todo" y resolver problemas complejos.
+*   **Dis (Disimilitud)**: Capacidad de distinguir entre valoraciones positivas y negativas.
+*   **Índices Porcentuales (Dim%, Int%, AI%)**: Indicadores existenciales y psicológicos de la actitud del individuo.
+*   **Rho (ρ)**: Correlación con la norma teórica objetiva.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Integración con Inteligencia Artificial (IA)
+La aplicación utiliza modelos avanzados de lenguaje (LLMs) a través de **Laravel AI** para:
+*   **Interpretación Automatizada**: Transforma los datos técnicos en una narrativa comprensible y profesional.
+*   **Diagnóstico Profundo**: Identifica patrones de comportamiento, fortalezas y áreas de mejora basadas en la estructura axiológica.
+*   **Soporte a la Decisión**: Ayuda a los reclutadores a filtrar candidatos basándose en interpretaciones cualitativas de alto nivel.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Stack Tecnológico
+*   **Backend**: Laravel 13 + PHP 8.3
+*   **Panel Administrativo**: Filament 4.0
+*   **Frontend**: Livewire Volt + Alpine.js + Tailwind CSS
+*   **IA**: Integración con Laravel AI (OpenAI/Anthropic)
+*   **Reportes**: DomPDF para generación de diagnósticos en PDF.
 
-## Learning Laravel
+## Arquitectura y Despliegue
+El sistema está diseñado para ejecutarse en un entorno empresarial robusto:
+*   **Plataforma**: IONOS Cloud.
+*   **Panel de Control**: Plesk.
+*   **Sistema Operativo**: CentOS 8 (Stream).
+*   **Servidor Web**: Nginx / Apache configurado para alta disponibilidad.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+## Base de Datos
+*   **Actual**: MySQL / MariaDB para almacenamiento relacional de perfiles, resultados y rankings.
+*   **Futura**: Implementación de bases de datos vectoriales para análisis comparativos avanzados y almacenamiento de embeddings de perfiles psicológicos.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Visión a Futuro y Codexia Hub
+Este proyecto es un pilar fundamental dentro del ecosistema de **Codexia Hub**. La visión a futuro incluye:
+*   **Centralización**: Integración total como módulo de talento dentro de Codexia Hub.
+*   **Talent Matching**: Algoritmos avanzados que crucen perfiles axiológicos con requerimientos de puestos específicos.
+*   **Evolución del Producto**: Desarrollo de nuevas versiones del test (Hartman 2.0) con mayor interactividad e interpretación en tiempo real mediante agentes de IA autónomos.
 
-## Laravel Sponsors
-
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
-
-### Premium Partners
-
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+---
+© 2026 Codexia Hub. Todos los derechos reservados.
