@@ -13,6 +13,11 @@ use Illuminate\Support\Facades\Hash;
 
 class UserResource extends Resource
 {
+    public static function canViewAny(): bool
+    {
+        return auth()->user()?->isAdmin() ?? false;
+    }
+
     protected static ?string $model = User::class;
 
     protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-users';

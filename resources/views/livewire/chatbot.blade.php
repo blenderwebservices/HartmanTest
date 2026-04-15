@@ -71,11 +71,6 @@ new class extends Component {
 ?>
 
 <div class="fixed bottom-6 right-6 z-[100] flex flex-col items-end" x-data="{ open: @entangle('isOpen') }">
-    <!-- KaTeX for math rendering -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
-    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
-
     <style>
         .prose-chat p { margin-bottom: 0.5rem; }
         .prose-chat p:last-child { margin-bottom: 0; }
@@ -118,14 +113,13 @@ new class extends Component {
         </div>
 
         <!-- Chat Area -->
-        <div class="flex-grow overflow-y-auto p-4 space-y-4 bg-[#e5ddd5]" id="chat-messages"
-             x-init="$watch('messages', () => { $nextTick(() => { $el.scrollTop = $el.scrollHeight }) })">
+        <div class="flex-grow overflow-y-auto p-4 space-y-4 bg-[#e5ddd5] scroll-smooth" id="chat-messages">
             <div class="text-center">
                 <span class="bg-white/60 text-[10px] px-2 py-1 rounded-lg text-slate-500 uppercase tracking-wider font-bold shadow-sm">Hoy</span>
             </div>
 
-            @foreach($messages as $msg)
-                <div class="flex {{ $msg['role'] === 'user' ? 'justify-end' : 'justify-start' }}">
+            @foreach($messages as $index => $msg)
+                <div class="flex {{ $msg['role'] === 'user' ? 'justify-end' : 'justify-start' }}" id="msg-{{ $index }}">
                     <div class="max-w-[85%] rounded-2xl p-3 shadow-sm relative {{ $msg['role'] === 'user' ? 'bg-[#dcf8c6] rounded-tr-none' : 'bg-white rounded-tl-none' }}">
                         <div class="text-sm text-slate-800 leading-relaxed prose-chat">
                             {!! Str::markdown($msg['content']) !!}
@@ -160,7 +154,6 @@ new class extends Component {
                           class="w-full bg-transparent border-0 focus:ring-0 py-2 text-sm resize-none"></textarea>
             </div>
             <button wire:click="sendMessage"
-                    @click="$nextTick(() => { const chat = document.getElementById('chat-messages'); chat.scrollTop = chat.scrollHeight })"
                     class="w-10 h-10 bg-[#075e54] text-white rounded-full flex items-center justify-center hover:bg-[#128c7e] transition-all shadow-lg active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                     wire:loading.attr="disabled"
                     wire:target="sendMessage">
@@ -187,34 +180,26 @@ new class extends Component {
 
 @script
 <script>
-    function renderMath() {
-        if (typeof renderMathInElement === 'function') {
-            renderMathInElement(document.getElementById('chat-messages'), {
-                delimiters: [
-                    {left: '$$', right: '$$', display: true},
-                    {left: '$', right: '$', display: false},
-                    {left: '\\(', right: '\\)', display: false},
-                    {left: '\\[', right: '\\]', display: true}
-                ],
-                throwOnError: false
-            });
-        }
-    }
-
     $wire.on('message-sent', () => {
-        setTimeout(() => {
-            renderMath();
+        $nextTick(() => {
             const chatMessages = document.getElementById('chat-messages');
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }, 50);
+            const userMessages = chatMessages.querySelectorAll('.justify-end'); // User messages
+            
+            if (userMessages.length > 0) {
+                // Scroll to the last user message to show the start of the response
+                const lastUserMsg = userMessages[userMessages.length - 1];
+                lastUserMsg.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            } else {
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+        });
     });
 
     $wire.on('chat-opened', () => {
-        setTimeout(() => {
-            renderMath();
+        $nextTick(() => {
             const chatMessages = document.getElementById('chat-messages');
             chatMessages.scrollTop = chatMessages.scrollHeight;
-        }, 50);
+        });
     });
 </script>
 @endscript

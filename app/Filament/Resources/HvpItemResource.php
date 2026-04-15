@@ -15,6 +15,11 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class HvpItemResource extends Resource
 {
+    public static function canViewAny(): bool
+    {
+        return auth()->user()?->isAdmin() ?? false;
+    }
+
 
     protected static ?string $model = HvpItem::class;
 
