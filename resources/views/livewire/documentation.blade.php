@@ -1,9 +1,25 @@
 <div class="w-full max-w-6xl mx-auto p-6 text-gray-800">
     
-    <!-- Hero -->
-    <section class="text-center mb-16">
-        <h1 class="text-4xl md:text-5xl font-bold mb-4">{{ __('documentation.title') }}</h1>
-        <p class="text-lg text-gray-600 max-w-3xl mx-auto">{{ __('documentation.subtitle') }}</p>
+    <!-- Hero Section -->
+    <section class="relative py-20 mb-16 overflow-hidden rounded-3xl bg-indigo-900 text-white shadow-2xl">
+        <div class="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
+        <div class="relative z-10 text-center px-6">
+            <h1 class="text-4xl md:text-6xl font-extrabold mb-6 tracking-tight">
+                {{ __('documentation.title') }}
+            </h1>
+            <p class="text-xl md:text-2xl text-indigo-100 max-w-3xl mx-auto mb-10 leading-relaxed">
+                {{ __('documentation.subtitle') }}
+            </p>
+            <div class="flex flex-col sm:flex-row justify-center gap-4">
+                <a href="{{ route('test3') }}" class="inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-indigo-900 bg-white rounded-full hover:bg-indigo-50 transition-all transform hover:scale-105 shadow-xl">
+                    Comenzar Test de Hartman
+                    <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
+                </a>
+                <a href="#fundamentos" class="inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-white border-2 border-white/30 rounded-full hover:bg-white/10 transition-all">
+                    Leer Documentación
+                </a>
+            </div>
+        </div>
     </section>
 
     <!-- Fundamentos -->

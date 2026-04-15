@@ -23,6 +23,40 @@ class HvpResult extends Model
         'part_2_ranking' => 'array',
         'scores' => 'array',
     ];
+
+    public function recalculateScores()
+    {
+        $part1Scores = self::calculateProfile($this->part_1_ranking, 'part_1');
+        $part2Scores = self::calculateProfile($this->part_2_ranking, 'part_2');
+
+        $this->scores = [
+            'part_1' => $part1Scores,
+            'part_2' => $part2Scores,
+        ];
+
+        return $this->save();
+    }
+
+    public function generateAiInterpretation(): string
+    {
+        try {
+            $agent = new \App\Ai\Agents\ChatAgent();
+            $userPrompt = "Por favor, analiza y brinda una interpretación profesional de los siguientes resultados del Test de Hartman: " . json_encode($this->scores);
+            
+            $interpretation = (string) $agent->prompt($userPrompt);
+            
+            $this->update([
+                'ai_interpretation' => $interpretation
+            ]);
+
+            return $interpretation;
+        } catch (\Exception $e) {
+            $errorMsg = "Lo sentimos, hubo un error al generar la interpretación: " . $e->getMessage();
+            $this->update(['ai_interpretation' => $errorMsg]);
+            return $errorMsg;
+        }
+    }
+
     public static function calculateProfile(array $userRanking, string $part)
     {
         $items = \App\Models\HvpItem::where('part', $part)->get()->keyBy('id');
@@ -151,5 +185,23 @@ class HvpResult extends Model
             'AIP' => $var_AIP,
             'Rho' => $var_Rho,
         ];
+    }
+
+    public static function formatForPdf(string $text): string
+    {
+        // Replace inline LaTeX variables: $VAR_{subscript}$ or $VAR$
+        // Pattern: \$([A-Z_a-z]+(?:_\{?[A-Za-z0-9]+\}?)?)\$
+        $text = preg_replace_callback('/\$([A-Z_a-z]+(?:_\{?[A-Za-z0-9]+\}?)?)\$/', function ($matches) {
+            $cleaned = str_replace(['_', '{', '}'], [' ', ' (', ')'], $matches[1]);
+            return "**" . trim($cleaned) . "**";
+        }, $text);
+
+        // Replace formulas like $A > B > C$ or similar simple expressions
+        $text = preg_replace_callback('/\$([^$]+)\$/', function ($matches) {
+            return "**" . trim($matches[1]) . "**";
+        }, $text);
+
+        // Remove any remaining $ signs that might be left over from broken LaTeX
+        return str_replace('$', '', $text);
     }
 }

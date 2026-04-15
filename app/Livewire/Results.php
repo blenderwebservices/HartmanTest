@@ -24,27 +24,30 @@ class Results extends Component
         }
     }
 
-    public function generateAiInterpretation()
+    public function generateAiInterpretation($force = false)
     {
-        // Si ya existe, no regenerar a menos que sea explícito (ahorramos tokens)
-        if ($this->aiInterpretation && !$this->isLoadingAi) {
+        // Si ya existe, no regenerar a menos que sea explícito
+        if ($this->aiInterpretation && !$this->isLoadingAi && !$force) {
             return;
         }
 
         $this->isLoadingAi = true;
         
         try {
-            $agent = new \App\Ai\Agents\ChatAgent();
-            $userPrompt = "Por favor, analiza y brinda una interpretación profesional de los siguientes resultados del Test de Hartman: " . json_encode($this->result->scores);
-            
-            $this->aiInterpretation = (string) $agent->prompt($userPrompt);
-            
-            // Guardar en la base de datos
-            $this->result->update([
-                'ai_interpretation' => $this->aiInterpretation
-            ]);
-        } catch (\Exception $e) {
-            $this->aiInterpretation = "Lo sentimos, hubo un error al generar la interpretación: " . $e->getMessage();
+            $this->aiInterpretation = $this->result->generateAiInterpretation();
+        } finally {
+            $this->isLoadingAi = false;
+        }
+    }
+
+    public function recalculate()
+    {
+        $this->isLoadingAi = true;
+        $this->aiInterpretation = ''; // Limpiar para mostrar loading
+
+        try {
+            $this->result->recalculateScores();
+            $this->aiInterpretation = $this->result->generateAiInterpretation();
         } finally {
             $this->isLoadingAi = false;
         }
@@ -58,7 +61,7 @@ class Results extends Component
 
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.diagnosis', [
             'result' => $this->result,
-            'aiInterpretation' => $this->aiInterpretation,
+            'aiInterpretation' => \App\Models\HvpResult::formatForPdf($this->aiInterpretation),
             'date' => now()->format('d/m/Y'),
             'part1Normative' => $this->part1Normative,
             'part2Normative' => $this->part2Normative,

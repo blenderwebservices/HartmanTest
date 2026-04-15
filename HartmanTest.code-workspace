@@ -4,9 +4,6 @@
 			"path": "."
 		},
 		{
-			"path": "../qcc-ia"
-		},
-		{
 			"path": "../codexiahub-web"
 		}
 	],

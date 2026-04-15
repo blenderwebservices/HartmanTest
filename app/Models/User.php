@@ -13,6 +13,12 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
 
     /**
+     * Roles
+     */
+    public const ROLE_ADMIN = 'admin';
+    public const ROLE_USER = 'user';
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var list<string>
@@ -22,7 +28,16 @@ class User extends Authenticatable
         'email',
         'password',
         'locale',
+        'role',
     ];
+
+    /**
+     * @return bool
+     */
+    public function isAdmin(): bool
+    {
+        return $this->role === self::ROLE_ADMIN;
+    }
 
     /**
      * The attributes that should be hidden for serialization.

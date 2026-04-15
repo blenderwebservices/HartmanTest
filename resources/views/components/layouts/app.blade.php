@@ -6,6 +6,12 @@
     <title>{{ $title ?? 'Hartman Test' }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+    
+    <!-- KaTeX for math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+
     @livewireStyles
 </head>
 <body class="bg-gray-100 font-sans antialiased">
@@ -36,9 +42,9 @@
         <!-- User Menu -->
         <div class="flex items-center space-x-4 text-sm">
             @auth
-                <span class="text-gray-700">{{ auth()->user()->name }}</span>
+                <span class="text-gray-700 font-medium">{{ auth()->user()->name }}</span>
                 <span class="text-gray-300">|</span>
-                <a href="/admin" class="text-indigo-600 hover:text-indigo-800">Admin Panel</a>
+                <a href="/admin" class="bg-indigo-600 text-white px-4 py-1.5 rounded-lg font-bold hover:bg-indigo-700 transition-all shadow-sm">Dashboard</a>
             @else
                 <a href="/admin/login" class="text-gray-600 hover:text-gray-800">Login</a>
                 <span class="text-gray-300">|</span>

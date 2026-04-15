@@ -135,12 +135,12 @@
     </div>
 
     <div class="footer">
-        <p>¡Gracias por confiar en Quality & Competitive College para su desarrollo profesional!</p>
+        <p>¡Gracias por confiar en CodexiaHub para su desarrollo profesional!</p>
         <p class="warning">
             <strong>ADVERTENCIA:</strong> Este reporte es una herramienta de orientación generada mediante inteligencia artificial. 
             Debe ser interpretado por un profesional certificado en la metodología Hartman para decisiones críticas de contratación o desarrollo.
         </p>
-        <p>&copy; {{ date('Y') }} Quality & Competitive College (QCC). Todos los derechos reservados.</p>
+        <p>&copy; {{ date('Y') }} CodexiaHub. Todos los derechos reservados.</p>
     </div>
 </body>
 </html>
