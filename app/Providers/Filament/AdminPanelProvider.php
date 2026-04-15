@@ -28,6 +28,8 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
+            ->registration()
+            ->brandName('Test de Hartman')
             ->colors([
                 'primary' => Color::Amber,
             ])
@@ -77,6 +79,26 @@ class AdminPanelProvider extends PanelProvider
                             });
                         }).observe(document.body, { childList: true, subtree: true });
                     "></script>
+                '),
+            )
+            ->renderHook(
+                'panels::auth.login.form.after',
+                fn () => new \Illuminate\Support\HtmlString('
+                    <div class="mt-4 text-center">
+                        <a href="/" class="text-sm font-medium text-primary-600 hover:text-primary-500 transition-colors">
+                            &larr; Volver al inicio
+                        </a>
+                    </div>
+                '),
+            )
+            ->renderHook(
+                'panels::auth.register.form.after',
+                fn () => new \Illuminate\Support\HtmlString('
+                    <div class="mt-4 text-center">
+                        <a href="/" class="text-sm font-medium text-primary-600 hover:text-primary-500 transition-colors">
+                            &larr; Volver al inicio
+                        </a>
+                    </div>
                 '),
             );
     }
