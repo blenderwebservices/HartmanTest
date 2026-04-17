@@ -204,6 +204,9 @@
                         animation: 250,
                         ghostClass: 'dragging',
                         draggable: '.formula-card',
+                        delay: 150, // time in milliseconds to define when the sorting should start
+                        delayOnTouchOnly: true, // only delay if user is using touch
+                        touchStartThreshold: 5, // px, how many pixels the point should move before cancelling a delayed drag event
                         onEnd: (evt) => {
                             const domNodes = Array.from(this.$refs.grid.querySelectorAll('.formula-card'));
                             const idOrder = domNodes.map(node => node.getAttribute('data-id'));
