@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hartman Profile Modern UI - Drag & Drop</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- SortableJS para un Drag & Drop fluido y moderno -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+        }
+
+        .item-card {
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: grab;
+            user-select: none;
+            position: relative;
+        }
+
+        .item-card:active {
+            cursor: grabbing;
+        }
+
+        /* Asegura que el elemento que se mueve esté siempre arriba de todo */
+        .sortable-chosen {
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4);
+            transform: scale(1.05);
+            z-index: 9999 !important;
+            opacity: 1 !important;
+            background-color: #1e293b !important; /* Slate 800 */
+        }
+
+        .sortable-ghost {
+            opacity: 0.2;
+            background: #3b82f6 !important;
+            border: 2px dashed #60a5fa !important;
+        }
+
+        /* Manejo de capas para el contenedor sticky y el ranking */
+        .concepts-sidebar {
+            z-index: 10;
+        }
+
+        .ranking-area {
+            position: relative;
+            z-index: 20; /* Superior a la sidebar para evitar solapamientos de sombra */
+        }
+
+        .rank-number {
+            min-width: 2.5rem;
+            height: 2.5rem;
+        }
+
+        /* Animación de entrada */
+        .list-enter {
+            animation: slideIn 0.3s ease-out forwards;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .empty-placeholder {
+            border: 2px dashed #334155;
+            background: rgba(30, 41, 59, 0.5);
+        }
+
+        /* Scrollbar estética */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 5px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="max-w-6xl mx-auto">
+        <header class="mb-8 text-center">
+            <h1 class="text-3xl font-bold text-slate-800">Evaluación Hartman</h1>
+            <p class="text-slate-500 mt-2 text-lg">Haz clic para elegir y <span class="text-blue-600 font-semibold underline">arrastra para reordenar</span> tu ranking.</p>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+            
+            <!-- Columna de Conceptos Pendientes -->
+            <div class="concepts-sidebar bg-white p-6 rounded-2xl shadow-sm border border-slate-200 sticky top-8">
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h2 class="text-xl font-semibold text-slate-700">Conceptos</h2>
+                        <p class="text-xs text-slate-400 mt-1">Toca los elementos para clasificarlos</p>
+                    </div>
+                    <span id="pending-count" class="bg-slate-100 text-slate-600 px-3 py-1 rounded-full text-sm font-medium transition-all">18 pendientes</span>
+                </div>
+                
+                <div id="pool" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 gap-2 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
+                    <!-- Los items se cargan dinámicamente -->
+                </div>
+            </div>
+
+            <!-- Columna de Ranking con Drag & Drop -->
+            <div class="ranking-area bg-slate-900 p-6 rounded-2xl shadow-xl border border-slate-800">
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h2 class="text-xl font-semibold text-white">Tu Ranking</h2>
+                        <p class="text-xs text-slate-400 mt-1">1 = Más Bueno | 18 = Más Malo</p>
+                    </div>
+                    <button id="reset-btn" class="text-slate-400 hover:text-white text-sm flex items-center gap-1 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                        Reiniciar
+                    </button>
+                </div>
+
+                <div id="ranked-list" class="space-y-2 min-h-[450px] transition-all relative">
+                    <!-- Los items ordenados aparecerán aquí -->
+                </div>
+                
+                <div id="submit-section" class="mt-8 hidden">
+                    <button id="submit-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl transition-all shadow-lg transform hover:-translate-y-1 active:scale-95">
+                        Confirmar y Finalizar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Resultados -->
+    <div id="modal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm hidden flex items-center justify-center p-4 z-[100]">
+        <div class="bg-white rounded-3xl p-8 max-w-md w-full text-center shadow-2xl scale-in">
+            <div class="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            </div>
+            <h3 class="text-2xl font-bold text-slate-800">¡Secuencia Guardada!</h3>
+            <p class="text-slate-600 mt-3">Has organizado satisfactoriamente los 18 conceptos del perfil Hartman.</p>
+            <div id="summary" class="mt-4 p-3 bg-slate-50 rounded-lg text-xs text-left text-slate-500 font-mono overflow-x-auto"></div>
+            <button onclick="location.reload()" class="mt-8 w-full bg-slate-800 hover:bg-slate-700 text-white py-4 rounded-xl font-bold transition-all">
+                Realizar otra prueba
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const concepts = [
+            "Una buena comida", "Un bebé", "Un mundo técnico", "Una persona odiosa", 
+            "Torturar a una persona", "Un uniforme", "Servir a la humanidad", "Un esclavo", 
+            "Un cortocircuito", "Amor por la naturaleza", "Un genio", "Un basurero", 
+            "La autoridad", "Un ratero", "La libertad", "Un asesino", "La justicia", "La paz"
+        ];
+
+        let unranked = [...concepts];
+        let ranked = [];
+
+        const poolEl = document.getElementById('pool');
+        const rankedEl = document.getElementById('ranked-list');
+        const pendingCountEl = document.getElementById('pending-count');
+        const submitSection = document.getElementById('submit-section');
+        const resetBtn = document.getElementById('reset-btn');
+
+        function init() {
+            render();
+            setupSortable();
+        }
+
+        function setupSortable() {
+            new Sortable(rankedEl, {
+                animation: 150,
+                ghostClass: 'sortable-ghost',
+                chosenClass: 'sortable-chosen',
+                dragClass: 'sortable-drag',
+                forceFallback: false, // Usar drag nativo para mejor rendimiento z-index
+                onEnd: function () {
+                    const newOrder = [];
+                    rankedEl.querySelectorAll('.ranked-item-text').forEach(el => {
+                        newOrder.push(el.textContent);
+                    });
+                    ranked = newOrder;
+                    renderNumbers();
+                }
+            });
+        }
+
+        function render() {
+            poolEl.innerHTML = '';
+            unranked.forEach((text) => {
+                const div = document.createElement('div');
+                div.className = 'item-card bg-slate-50 border border-slate-200 p-3 rounded-xl flex items-center gap-3 hover:border-blue-400 hover:bg-blue-50 transition-all list-enter';
+                div.innerHTML = `
+                    <div class="w-6 h-6 rounded-full bg-white border border-slate-200 flex items-center justify-center text-[10px] text-slate-300 font-bold">?</div>
+                    <span class="text-slate-700 text-sm font-medium">${text}</span>
+                `;
+                div.onclick = () => addToRank(text);
+                poolEl.appendChild(div);
+            });
+
+            rankedEl.innerHTML = '';
+            if (ranked.length === 0) {
+                rankedEl.innerHTML = `
+                    <div class="empty-placeholder rounded-2xl p-12 text-center text-slate-500 flex flex-col items-center gap-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 opacity-20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                        </svg>
+                        <p class="text-sm font-light">Selecciona conceptos para empezar.<br>Arrastra para reordenar.</p>
+                    </div>
+                `;
+            }
+
+            ranked.forEach((text, index) => {
+                const div = document.createElement('div');
+                div.className = 'item-card bg-slate-800 border border-slate-700 p-3 rounded-xl flex items-center gap-4 hover:border-blue-500 shadow-lg group list-enter';
+                div.innerHTML = `
+                    <div class="rank-pos-number w-8 h-8 rounded-lg bg-slate-700 flex items-center justify-center text-white font-bold text-sm group-hover:bg-blue-600 transition-colors">${index + 1}</div>
+                    <span class="ranked-item-text text-slate-200 text-sm font-medium flex-1">${text}</span>
+                    <div class="flex items-center gap-2">
+                        <div class="cursor-grab p-1 text-slate-600 group-hover:text-slate-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16" />
+                            </svg>
+                        </div>
+                        <button class="text-slate-600 hover:text-red-400 p-1 transition-colors" onclick="removeFromRank(event, '${text}')">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                    </div>
+                `;
+                rankedEl.appendChild(div);
+            });
+
+            updateStateUI();
+        }
+
+        function renderNumbers() {
+            const numbers = rankedEl.querySelectorAll('.rank-pos-number');
+            numbers.forEach((num, i) => {
+                num.textContent = i + 1;
+            });
+        }
+
+        function updateStateUI() {
+            pendingCountEl.textContent = `${unranked.length} pendiente${unranked.length !== 1 ? 's' : ''}`;
+            if (unranked.length === 0) {
+                submitSection.classList.remove('hidden');
+                pendingCountEl.className = "bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium transition-all";
+                pendingCountEl.textContent = '¡Completado!';
+            } else {
+                submitSection.classList.add('hidden');
+                pendingCountEl.className = "bg-slate-100 text-slate-600 px-3 py-1 rounded-full text-sm font-medium transition-all";
+            }
+        }
+
+        function addToRank(text) {
+            unranked = unranked.filter(t => t !== text);
+            ranked.push(text);
+            render();
+        }
+
+        function removeFromRank(event, text) {
+            event.stopPropagation();
+            ranked = ranked.filter(t => t !== text);
+            unranked.push(text);
+            render();
+        }
+
+        resetBtn.onclick = () => {
+            unranked = [...concepts];
+            ranked = [];
+            render();
+        };
+
+        document.getElementById('submit-btn').onclick = () => {
+            document.getElementById('summary').textContent = JSON.stringify(ranked, null, 2);
+            document.getElementById('modal').classList.remove('hidden');
+        };
+
+        init();
+    </script>
+</body>
+</html>

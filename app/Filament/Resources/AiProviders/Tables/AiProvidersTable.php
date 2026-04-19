@@ -58,10 +58,30 @@ class AiProvidersTable
                     })
                     ->requiresConfirmation(),
                 EditAction::make(),
+                \Filament\Actions\ReplicateAction::make()
+                    ->excludeAttributes(['is_default'])
+                    ->mutateRecordDataUsing(function (array $data): array {
+                        $data['name'] = $data['name'] . ' (Copia)';
+                        $data['is_default'] = false;
+                        return $data;
+                    }),
                 DeleteAction::make(),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
+                    \Filament\Actions\BulkAction::make('clone')
+                        ->label('Clonar seleccionados')
+                        ->icon('heroicon-o-document-duplicate')
+                        ->color('warning')
+                        ->action(function (\Illuminate\Database\Eloquent\Collection $records) {
+                            foreach ($records as $record) {
+                                $clone = $record->replicate();
+                                $clone->name = $clone->name . ' (Copia)';
+                                $clone->is_default = false;
+                                $clone->save();
+                            }
+                        })
+                        ->deselectRecordsAfterCompletion(),
                     DeleteBulkAction::make(),
                 ]),
             ]);

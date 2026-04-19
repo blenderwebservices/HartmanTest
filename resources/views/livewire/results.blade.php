@@ -21,6 +21,69 @@
 
     <h1 class="text-3xl font-bold mb-8 text-center text-gray-800">{{ __('test.results_title') ?? 'Test Results' }}</h1>
 
+    <div wire:init="generateAiInterpretation" class="mb-12">
+        <div class="clay-card p-8 md:p-12 transition-all duration-500 hover:scale-[1.01]">
+            <div class="flex items-center gap-4 mb-8 border-b-2 border-gray-100 pb-6">
+                <div class="bg-indigo-600 p-3 rounded-2xl shadow-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                </div>
+                <div class="flex-1">
+                    <h3 class="text-2xl font-black text-gray-800 tracking-tight">Interpretación del Agente IA ✨</h3>
+                    <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Powered by Hartman Intelligence Agent</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    @if($aiInterpretation && !$isLoadingAi)
+                        <button wire:click="recalculate" wire:loading.attr="disabled" class="flex items-center gap-2 bg-white border-2 border-indigo-600 text-indigo-600 px-4 py-2 rounded-xl font-bold hover:bg-indigo-50 transition-all active:scale-95 shadow-sm">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" wire:loading.class="animate-spin" wire:target="recalculate">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            </svg>
+                            Recalcular
+                        </button>
+
+                        <button wire:click="downloadPdf" class="flex items-center gap-2 bg-white border-2 border-indigo-600 text-indigo-600 px-4 py-2 rounded-xl font-bold hover:bg-indigo-50 transition-all active:scale-95 shadow-sm">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                            </svg>
+                            Descargar PDF
+                        </button>
+                    @endif
+                </div>
+            </div>
+
+            @if($isLoadingAi)
+                <div class="flex flex-col items-center justify-center py-12 space-y-6">
+                    <div class="relative w-24 h-24">
+                        <div class="absolute inset-0 border-4 border-indigo-200 rounded-full"></div>
+                        <div class="absolute inset-0 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <svg class="w-8 h-8 text-indigo-600 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-xl text-indigo-800 font-bold animate-pulse mb-2">Analizando perfiles axiológicos...</p>
+                        <p class="text-sm text-indigo-500">Este proceso puede tomar unos segundos.</p>
+                    </div>
+                </div>
+            @elseif($aiInterpretation)
+                <div 
+                    x-data="{ renderMath() { if (window.renderMathInElement) renderMathInElement($el, { delimiters: [ {left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false} ] }); } }" 
+                    x-effect="renderMath(); $nextTick(() => renderMath())"
+                    class="markdown-content text-gray-700"
+                >
+                    {!! Illuminate\Support\Str::markdown($aiInterpretation) !!}
+                </div>
+            @else
+                <div class="text-center py-8 text-gray-400 font-medium italic">
+                    Esperando datos para iniciar el análisis...
+                </div>
+            @endif
+        </div>
+    </div>
+
     <div class="grid md:grid-cols-2 gap-8">
         <!-- Part 1 Results -->
         <div class="bg-white shadow-md rounded-lg p-6">
@@ -142,57 +205,7 @@
         </div>
     </div>
 
-    <div wire:init="generateAiInterpretation" class="mt-12 mb-12">
-        <div class="clay-card p-8 md:p-12 transition-all duration-500 hover:scale-[1.01]">
-            <div class="flex items-center gap-4 mb-8 border-b-2 border-gray-100 pb-6">
-                <div class="bg-indigo-600 p-3 rounded-2xl shadow-lg">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
-                </div>
-                <div class="flex-1">
-                    <h3 class="text-2xl font-black text-gray-800 tracking-tight">Interpretación del Agente IA ✨</h3>
-                    <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Powered by Hartman Intelligence Agent</p>
-                </div>
-                <div class="flex items-center gap-2">
-                    @if($aiInterpretation && !$isLoadingAi)
-                        <button wire:click="recalculate" wire:loading.attr="disabled" class="flex items-center gap-2 bg-white border-2 border-indigo-600 text-indigo-600 px-4 py-2 rounded-xl font-bold hover:bg-indigo-50 transition-all active:scale-95 shadow-sm">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" wire:loading.class="animate-spin" wire:target="recalculate">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                            </svg>
-                            Recalcular
-                        </button>
-
-                        <button wire:click="downloadPdf" class="flex items-center gap-2 bg-white border-2 border-indigo-600 text-indigo-600 px-4 py-2 rounded-xl font-bold hover:bg-indigo-50 transition-all active:scale-95 shadow-sm">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                            </svg>
-                            Descargar PDF
-                        </button>
-                    @endif
-                </div>
-            </div>
-
-            @if($isLoadingAi)
-                <div class="flex flex-col items-center justify-center py-12 space-y-4">
-                    <div class="w-12 h-12 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
-                    <p class="text-indigo-600 font-bold animate-pulse">Analizando perfiles axiológicos...</p>
-                </div>
-            @elseif($aiInterpretation)
-                <div 
-                    x-data="{ renderMath() { if (window.renderMathInElement) renderMathInElement($el, { delimiters: [ {left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false} ] }); } }" 
-                    x-effect="renderMath(); $nextTick(() => renderMath())"
-                    class="markdown-content text-gray-700"
-                >
-                    {!! Illuminate\Support\Str::markdown($aiInterpretation) !!}
-                </div>
-            @else
-                <div class="text-center py-8 text-gray-400 font-medium italic">
-                    Esperando datos para iniciar el análisis...
-                </div>
-            @endif
-        </div>
-    </div>
+    <!-- AI interpretation section moved to top -->
 
     <div class="mt-8 text-center">
         <a href="{{ route('test3') }}" class="bg-indigo-600 text-white px-6 py-2 rounded-full font-bold shadow-lg hover:bg-indigo-700 transition-all hover:scale-105 active:scale-95 inline-block">
