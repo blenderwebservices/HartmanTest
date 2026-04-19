@@ -103,6 +103,12 @@
                     <p class="text-slate-500 mt-2 text-lg">Haz clic para elegir y <span class="text-blue-600 font-semibold underline">arrastra para reordenar</span> tu ranking.</p>
                 </header>
 
+                <div x-show="isComplete" class="mb-8" style="display: none;" x-transition>
+                    <button @click="submitStep()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl transition-all shadow-lg transform hover:-translate-y-1 active:scale-95 text-lg">
+                        Continuar a Parte 2: "El Yo"
+                    </button>
+                </div>
+
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
                     <!-- Columna de Conceptos Pendientes -->
                     <div class="concepts-sidebar bg-white p-6 rounded-2xl shadow-sm border border-slate-200 sticky top-8">
@@ -185,6 +191,12 @@
                     <h1 class="text-3xl font-bold text-slate-800">{{ __('test.part_2_title') }}</h1>
                     <p class="text-slate-500 mt-2 text-lg">Haz clic para elegir y <span class="text-blue-600 font-semibold underline">arrastra para reordenar</span> tu ranking.</p>
                 </header>
+
+                <div x-show="isComplete" class="mb-8" style="display: none;" x-transition>
+                    <button @click="submitFinal()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-xl transition-all shadow-lg transform hover:-translate-y-1 active:scale-95 text-lg">
+                        Finalizar Test
+                    </button>
+                </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
                     <!-- Columna de Conceptos Pendientes -->
