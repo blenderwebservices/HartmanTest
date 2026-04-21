@@ -165,7 +165,7 @@
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16" />
                                             </svg>
                                         </div>
-                                        <button class="text-slate-600 hover:text-red-400 p-1 transition-colors" @click="removeFromRank($event, item)">
+                                        <button class="remove-btn text-slate-600 hover:text-red-400 active:text-red-500 p-1 transition-colors" @click.stop="removeFromRank($event, item)" @touchend.stop.prevent="removeFromRank($event, item)">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                                 <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
                                             </svg>
@@ -254,7 +254,7 @@
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16" />
                                             </svg>
                                         </div>
-                                        <button class="text-slate-600 hover:text-red-400 p-1 transition-colors" @click="removeFromRank($event, item)">
+                                        <button class="remove-btn text-slate-600 hover:text-red-400 active:text-red-500 p-1 transition-colors" @click.stop="removeFromRank($event, item)" @touchend.stop.prevent="removeFromRank($event, item)">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                                 <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
                                             </svg>
@@ -303,6 +303,10 @@
                         ghostClass: 'sortable-ghost',
                         chosenClass: 'sortable-chosen',
                         draggable: '.sortable-item',
+                        filter: '.remove-btn',
+                        preventOnFilter: false,
+                        delay: 150,
+                        delayOnTouchOnly: true,
                         forceFallback: false,
                         onEnd: (evt) => {
                             const domNodes = Array.from(this.$refs.rankedList.querySelectorAll('.sortable-item'));
